@@ -39,7 +39,7 @@ Usage
 
 ````
 git clone https://github.com/mrlesmithjr/vagrant-box-templates
-cd vagrant-box-templates
+cd vagrant-box-templates/LinuxMint17
 ````
 Update nodes.yml to reflect your desired node(s) configurations to spin up.
 
