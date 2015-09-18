@@ -9,7 +9,7 @@
   roles:
   tasks:
     - name: ensuring vagrant user password is set to vagrant
-      user: name=vagrant password=vagrant
+      user: name=vagrant password=$6$QBZMhBvDPSa$Enq3PR3lKG31hPog47YYK8j/g59eHFhdS0x9frxRLbK8KKXhLTZNExeCewiU7JPkUX7bVU5mTIYQX2guDvIJt.
 
     - name: adding vagrant user to sudoers
       lineinfile: dest=/etc/sudoers regexp='^vagrant ALL' line='vagrant ALL=(ALL) NOPASSWD:ALL' validate='visudo -cf %s' state=present
