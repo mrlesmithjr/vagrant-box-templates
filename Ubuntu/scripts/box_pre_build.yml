@@ -71,7 +71,7 @@
       file: src="/opt/VBoxGuestAdditions-{{ virtualbox_guest_additions_ver }}/lib/VBoxGuestAdditions" dest=/usr/lib/VBoxGuestAdditions state=link
 
     - name: cleaning up dhcp leases
-      shell: rm /var/lib/dhcp/*
+      file: path=/var/lib/dhcp/ state=absent
 
     - name: Making sure Udev doesn't block our network
       file: path={{ item }} state=absent
