@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- hosts: 127.0.0.1
+  connection: local
   sudo: true
   vars:
     - virtualbox_guest_additions_iso: VBoxGuestAdditions_5.0.4.iso

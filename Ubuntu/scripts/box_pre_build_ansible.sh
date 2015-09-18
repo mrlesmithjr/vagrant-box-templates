@@ -3,4 +3,4 @@
 sudo apt-get install -y python-pip python-dev
 sudo pip install ansible==1.9.1
 
-ansible-playbook box_pre_build.yml
+ansible-playbook box_pre_build.yml --connection=local
