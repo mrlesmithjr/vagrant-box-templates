@@ -13,4 +13,7 @@ sudo rm -f /EMPTY
 
 sleep 15s
 
-ansible-playbook -i hosts box_cleanup_build.yml --connection=local
+history -c
+history -w
+
+sudo reboot
