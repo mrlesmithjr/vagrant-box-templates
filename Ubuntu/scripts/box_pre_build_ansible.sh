@@ -13,7 +13,6 @@ sudo rm -f /EMPTY
 
 sleep 15s
 
-history -c
-history -w
+history -cw
 
 sudo reboot
