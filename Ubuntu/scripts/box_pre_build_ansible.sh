@@ -11,9 +11,6 @@ ansible-playbook -i hosts box_pre_build.yml --connection=local --ask-sudo-pass
 sudo dd if=/dev/zero of=/EMPTY bs=1M
 sudo rm -f /EMPTY
 
-# Clear Bash History
-cat /dev/null > ~/.bash_history && history -c && exit
-
-sudo reboot
+sleep 15s
 
 ansible-playbook -i hosts box_cleanup_build.yml --connection=local
