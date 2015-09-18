@@ -13,3 +13,5 @@ sudo rm -f /EMPTY
 
 # Clear Bash History
 cat /dev/null > ~/.bash_history && history -c && exit
+
+sudo reboot
