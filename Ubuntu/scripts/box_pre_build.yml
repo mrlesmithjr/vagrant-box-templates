@@ -8,6 +8,12 @@
 #  vars_files:
   roles:
   tasks:
+    - name: ensuring vagrant user password is set to vagrant
+      user: name=vagrant password=vagrant
+
+    - name: adding vagrant user to sudoers
+      lineinfile: dest=/etc/sudoers regexp='^vagrant ALL' line='vagrant ALL=(ALL) NOPASSWD:ALL' validate='visudo -cf %s' state=present
+
     - name: updating apt cache
       apt: update_cache=yes
       when: ansible_os_family == "Debian"
@@ -55,7 +61,7 @@
       get_url: url="{{ virtualbox_guest_additions_dl_url }}/{{ virtualbox_guest_additions_iso }}" dest="/home/vagrant/{{ virtualbox_guest_additions_iso }}"
 
     - name: mounting VirtualBoxAdditions ISO
-      mount: name=/mnt/virtualbox src="/home/vagrant/{{ virtualbox_guest_additions_iso }}" fstype=iso9660 state=present
+      mount: name=/mnt/virtualbox src="/home/vagrant/{{ virtualbox_guest_additions_iso }}" fstype=iso9660 state=mounted
 
     - name: installing VirtualBoxAdditions
       shell: sh /mnt/virtualbox/VBoxLinuxAdditions.run
