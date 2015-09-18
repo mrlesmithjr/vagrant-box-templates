@@ -91,15 +91,15 @@
     - name: Adding a 2 sec delay to the interface up, to make the dhclient happy
       lineinfile: dest=/etc/network/interfaces regexp="^pre-up sleep 2" line="pre-up sleep 2" insertafter=EOF
 
-    - name: Zero out the free space to save space in the final image
-      shell: "dd if=/dev/zero of=/EMPTY bs=1M"
-      ignore_errors: true
+#    - name: Zero out the free space to save space in the final image
+#      shell: "dd if=/dev/zero of=/EMPTY bs=1M"
+#      ignore_errors: true
 
-    - name: removing EMPTY folder
-      file: path=/EMPTY state=absent
+#    - name: removing EMPTY folder
+#      file: path=/EMPTY state=absent
 
-    - name: pausing for space to clear up
-      pause: seconds=15
+#    - name: pausing for space to clear up
+#      pause: seconds=15
 
     - name: removing Bash history
       file: path=/home/vagrant/.bash_history state=absent
