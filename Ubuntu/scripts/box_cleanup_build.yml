@@ -7,8 +7,8 @@
       command: "{{ item }}"
       sudo: false
       with_items:
-        - "cat /dev/null > ~/.bash_history"
         - "history -c"
+        - "history -w"
 
     - name: rebooting host
       command: shutdown -r now "rebooting to complete cleanup"
