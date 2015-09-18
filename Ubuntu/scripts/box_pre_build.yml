@@ -67,8 +67,8 @@
     - name: installing VirtualBoxAdditions
       shell: sh /mnt/virtualbox/VBoxLinuxAdditions.run
 
-    - name: creating VirtualBoxAdditions symlink
-      file: src="/opt/VBoxGuestAdditions-{{ virtualbox_guest_additions_ver }}/lib/VBoxGuestAdditions" dest=/usr/lib/VBoxGuestAdditions state=link
+#    - name: creating VirtualBoxAdditions symlink
+#      file: src="/opt/VBoxGuestAdditions-{{ virtualbox_guest_additions_ver }}/lib/VBoxGuestAdditions" dest=/usr/lib/VBoxGuestAdditions state=link
 
     - name: cleaning up dhcp leases
       file: path=/var/lib/dhcp/ state=directory recurse=yes
