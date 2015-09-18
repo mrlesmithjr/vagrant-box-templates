@@ -95,5 +95,8 @@
       shell: "dd if=/dev/zero of=/EMPTY bs=1M && rm -f /EMPTY"
       ignore_errors: true
 
+    - name: pausing for space to clear up
+      pause: seconds=15
+
     - name: removing Bash history
       file: path=/home/vagrant/.bash_history state=absent
