@@ -1,0 +1,86 @@
+---
+- hosts: localhost
+  sudo: true
+  vars:
+    - virtualbox_guest_additions_iso: VBoxGuestAdditions_5.0.4.iso
+    - virtualbox_guest_additions_dl_url: http://download.virtualbox.org/virtualbox/5.0.4/
+  vars_files:
+  roles:
+  tasks:
+    - name: updating apt cache
+      apt: update_cache=yes
+      when: ansible_os_family == "Debian"
+
+    - name: installing pre-reqs
+      apt: name={{ item }} state=present
+      with_items:
+        - "linux-headers-{{ ansible_kernel }}"
+        - aptitude
+        - build-essential
+        - curl
+        - dkms
+        - facter
+        - libreadline-gplv2-dev
+        - libssl-dev
+        - openssh-server
+        - unzip
+        - wget
+        - zlib1g-dev
+      when: ansible_os_family == "Debian"
+
+    - name: updating all packages to the latest
+      apt: upgrade=safe
+      when: ansible_os_family == "Debian"
+
+    - name: creating build time
+      shell: date > /etc/vagrant_box_build_time
+
+    - name: creating vagrant ssh folder
+      file: path=/home/vagrant/.ssh state=directory owner=vagrant group=vagrant mode=0700
+
+    - name: downloading vagrant insecure ssh keys
+      get_url: url=https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub dest=/home/vagrant/.ssh/authorized_keys validate_certs=no
+
+    - name: setting permissions on authorized_keys
+      file: path=/home/vagrant/.ssh/authorized_keys owner=vagrant group=vagrant mode=0600
+
+    - name: setting permissions on vagrants ssh folder
+      file: path=/home/vagrant/.ssh owner=vagrant group=vagrant state=directory recurse=yes
+
+    - name: setting MOTD
+      shell: echo 'Development Environment' > /etc/motd
+
+    - name: downloading virtualbox guest additions
+      get_url: url="{{ virtualbox_guest_additions_dl_url }}/{{ virtualbox_guest_additions_iso }}" dest="/home/vagrant/{{ virtualbox_guest_additions_iso }}"
+
+    - name: mounting VirtualBoxAdditions ISO
+      mount: name=/mnt/virtualbox src="/home/vagrant/{{ virtualbox_guest_additions_iso }}" fstype=iso9660 state=present
+
+    - name: installing VirtualBoxAdditions
+      shell: sh /mnt/virtualbox/VBoxLinuxAdditions.run
+
+    - name: creating VirtualBoxAdditions symlink
+      file: src=/opt/VBoxGuestAdditions-*/lib/VBoxGuestAdditions dest=/usr/lib/VBoxGuestAdditions state=link
+
+    - name: cleaning up dhcp leases
+      shell: rm /var/lib/dhcp/*
+
+    - name: Making sure Udev doesn't block our network
+      file: path={{ item }} state=absent
+      with_items:
+        - /dev/.udev/
+        - /etc/udev/rules.d/70-persistent-net.rules
+        - /lib/udev/rules.d/75-persistent-net-generator.rules
+
+    - name: creating folders
+      file: path={{ item }} state=directory
+      with_items:
+        - /etc/udev/rules.d/70-persistent-net.rules
+
+    - name: Adding a 2 sec delay to the interface up, to make the dhclient happy
+      lineinfile: dest=/etc/network/interfaces regexp="^pre-up sleep 2" line="pre-up sleep 2" insertafter=EOF
+
+    - name: Zero out the free space to save space in the final image
+      shell: {{ item }}
+        - "dd if=/dev/zero of=/EMPTY bs=1M"
+        - "rm -f /EMPTY"
