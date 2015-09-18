@@ -3,8 +3,9 @@
   connection: local
   sudo: true
   vars:
-    - virtualbox_guest_additions_iso: VBoxGuestAdditions_5.0.4.iso
-    - virtualbox_guest_additions_dl_url: http://download.virtualbox.org/virtualbox/5.0.4/
+    - virtualbox_guest_additions_dl_url: "http://download.virtualbox.org/virtualbox/{{ virtualbox_guest_additions_ver }}/"
+    - virtualbox_guest_additions_iso: "VBoxGuestAdditions_{{ virtualbox_guest_additions_ver }}.iso"
+    - virtualbox_guest_additions_ver: 5.0.4
 #  vars_files:
   roles:
   tasks:
@@ -67,7 +68,7 @@
       shell: sh /mnt/virtualbox/VBoxLinuxAdditions.run
 
     - name: creating VirtualBoxAdditions symlink
-      file: src=/opt/VBoxGuestAdditions-*/lib/VBoxGuestAdditions dest=/usr/lib/VBoxGuestAdditions state=link
+      file: src="/opt/VBoxGuestAdditions-{{ virtualbox_guest_additions_ver }}/lib/VBoxGuestAdditions" dest=/usr/lib/VBoxGuestAdditions state=link
 
     - name: cleaning up dhcp leases
       shell: rm /var/lib/dhcp/*
@@ -92,3 +93,6 @@
       with_items:
         - "dd if=/dev/zero of=/EMPTY bs=1M"
         - "rm -f /EMPTY"
+
+    - name: removing Bash history
+      file: path=/home/vagrant/.bash_history state=absent
