@@ -5,7 +5,7 @@
   vars:
     - virtualbox_guest_additions_iso: VBoxGuestAdditions_5.0.4.iso
     - virtualbox_guest_additions_dl_url: http://download.virtualbox.org/virtualbox/5.0.4/
-  vars_files:
+#  vars_files:
   roles:
   tasks:
     - name: updating apt cache
