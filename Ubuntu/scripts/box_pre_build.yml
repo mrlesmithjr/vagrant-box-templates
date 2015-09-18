@@ -71,7 +71,10 @@
       file: src="/opt/VBoxGuestAdditions-{{ virtualbox_guest_additions_ver }}/lib/VBoxGuestAdditions" dest=/usr/lib/VBoxGuestAdditions state=link
 
     - name: cleaning up dhcp leases
-      file: path=/var/lib/dhcp/ state=absent
+      file: path=/var/lib/dhcp/ state=directory recurse=yes
+
+    - name: ensuring dhcp lib folder exists
+      file: path=/var/lib/dhcp state=directory
 
     - name: Making sure Udev doesn't block our network
       file: path={{ item }} state=absent
@@ -89,11 +92,8 @@
       lineinfile: dest=/etc/network/interfaces regexp="^pre-up sleep 2" line="pre-up sleep 2" insertafter=EOF
 
     - name: Zero out the free space to save space in the final image
-      shell: "{{ item }}"
+      shell: "dd if=/dev/zero of=/EMPTY bs=1M && rm -f /EMPTY"
       ignore_errors: true
-      with_items:
-        - "dd if=/dev/zero of=/EMPTY bs=1M"
-        - "rm -f /EMPTY"
 
     - name: removing Bash history
       file: path=/home/vagrant/.bash_history state=absent
