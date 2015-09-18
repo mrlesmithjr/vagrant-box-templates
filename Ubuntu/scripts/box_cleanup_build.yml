@@ -1,0 +1,14 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  sudo: true
+  tasks:
+    - name: cleaning up bash history
+      command: "{{ item }}"
+      sudo: false
+      with_items:
+        - "cat /dev/null > ~/.bash_history"
+        - "history -c"
+
+    - name: rebooting host
+      command: shutdown -r now "rebooting to complete cleanup"

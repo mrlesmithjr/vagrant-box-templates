@@ -15,3 +15,5 @@ sudo rm -f /EMPTY
 cat /dev/null > ~/.bash_history && history -c && exit
 
 sudo reboot
+
+ansible-playbook -i hosts box_cleanup_build.yml --connection=local
