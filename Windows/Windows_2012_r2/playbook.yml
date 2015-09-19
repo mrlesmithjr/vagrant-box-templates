@@ -1,0 +1,9 @@
+---
+- hosts: windows
+  tasks:
+    - name: install packages
+      win_chocolatey: name={{ item }} state=present
+      with_items:
+        - git.install
+        - 7zip.install
+        - putty

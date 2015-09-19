@@ -1,0 +1,4 @@
+vagrant-windows-2012-r2 ansible_ssh_host=127.0.0.1
+
+[windows]
+vagrant-windows-2012-r2
