@@ -22,13 +22,14 @@
     - name: installing pre-reqs
       dnf: name={{ item }} state=present
       with_items:
-        - kernel-headers
-        - kernel-devel
-        - gcc
+        - bzip2
         - curl
         - dkms
-        - make
         - facter
+        - gcc
+        - kernel-devel
+        - kernel-headers
+        - make
         - unzip
         - wget
       when: ansible_os_family == "RedHat"
