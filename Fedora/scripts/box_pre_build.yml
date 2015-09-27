@@ -9,6 +9,9 @@
 #  vars_files:
   roles:
   tasks:
+    - name: disabling selinux
+      selinux: state=disabled
+
     - name: ensuring vagrant user password is set to vagrant
       user: name=vagrant password=$6$QBZMhBvDPSa$Enq3PR3lKG31hPog47YYK8j/g59eHFhdS0x9frxRLbK8KKXhLTZNExeCewiU7JPkUX7bVU5mTIYQX2guDvIJt.
 
