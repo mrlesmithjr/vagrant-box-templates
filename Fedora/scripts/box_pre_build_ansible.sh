@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install Ansible to provision host
-sudo dnf install ansible
+sudo dnf -y install ansible
 
 # Run Ansible provisioning
 ansible-playbook -i hosts box_pre_build.yml --connection=local --ask-sudo-pass
