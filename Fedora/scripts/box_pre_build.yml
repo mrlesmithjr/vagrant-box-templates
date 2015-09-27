@@ -52,14 +52,14 @@
     - name: setting MOTD
       shell: echo 'Development Environment' > /etc/motd
 
-    - name: downloading virtualbox guest additions
-      get_url: url="{{ virtualbox_guest_additions_dl_url }}/{{ virtualbox_guest_additions_iso }}" dest="/home/vagrant/{{ virtualbox_guest_additions_iso }}"
+  #  - name: downloading virtualbox guest additions
+  #    get_url: url="{{ virtualbox_guest_additions_dl_url }}/{{ virtualbox_guest_additions_iso }}" dest="/home/vagrant/{{ virtualbox_guest_additions_iso }}"
 
-    - name: mounting VirtualBoxAdditions ISO
-      mount: name=/mnt/virtualbox src="/home/vagrant/{{ virtualbox_guest_additions_iso }}" fstype=iso9660 state=mounted
+  #  - name: mounting VirtualBoxAdditions ISO
+  #    mount: name=/mnt/virtualbox src="/home/vagrant/{{ virtualbox_guest_additions_iso }}" fstype=iso9660 state=mounted
 
-    - name: installing VirtualBoxAdditions
-      shell: sh /mnt/virtualbox/VBoxLinuxAdditions.run
+  #  - name: installing VirtualBoxAdditions
+  #    shell: sh /mnt/virtualbox/VBoxLinuxAdditions.run
 
 #    - name: creating VirtualBoxAdditions symlink
 #      file: src="/opt/VBoxGuestAdditions-{{ virtualbox_guest_additions_ver }}/lib/VBoxGuestAdditions" dest=/usr/lib/VBoxGuestAdditions state=link
