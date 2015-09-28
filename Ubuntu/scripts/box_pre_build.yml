@@ -66,6 +66,7 @@
 
     - name: installing VirtualBoxAdditions
       shell: sh /mnt/virtualbox/VBoxLinuxAdditions.run
+      ignore_errors: true
 
 #    - name: creating VirtualBoxAdditions symlink
 #      file: src="/opt/VBoxGuestAdditions-{{ virtualbox_guest_additions_ver }}/lib/VBoxGuestAdditions" dest=/usr/lib/VBoxGuestAdditions state=link
