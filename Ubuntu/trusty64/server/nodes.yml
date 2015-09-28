@@ -1,0 +1,33 @@
+---
+# Keep in mind....Vagrant will always create an initial interface as a NAT interface..Any definitions below are for adding additional interfaces.
+# for network_name define a var other than remaining blank to define an internal only network. Otherwise leave blank for a host-only network.
+# for DHCP leave ip and network_name vars blank
+# for Static define ip var
+# type should generally be private_network..Other option(s) are: public_network
+- name: node-1
+  box: mrlesmithjr/trusty64
+  mem: 512
+  cpus: 1
+  ansible_ssh_host_ip: 192.168.202.33 #always create for Ansible provisioning within nodes
+  config_interfaces: "False"  #defines if interfaces below should be created or not...Set to "False" if you do not wish to create the interfaces.
+  interfaces:  #Define additional interface settings
+    - ip: 192.168.12.11
+      auto_config: "True"
+      network_name: 01-to-02
+      method: static
+      type: private_network
+    - ip: 192.168.14.11
+      auto_config: "True"
+      network_name:
+      method: static
+      type: private_network
+    - ip: 192.168.15.11
+      auto_config: "False"
+      network_name: 01-to-05
+      method: static
+      type: private_network
+    - ip:
+      auto_config: "True"
+      network_name:
+      method: dhcp
+      type: private_network
