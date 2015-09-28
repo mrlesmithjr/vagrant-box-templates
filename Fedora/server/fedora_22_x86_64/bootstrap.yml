@@ -30,12 +30,12 @@
       apt: name=ansible state=latest
       when: ansible_os_family == "Debian"
 
-    - name: installing epel repo
-      yum: name=epel-release state=present
-      when: ansible_os_family == "RedHat"
+#    - name: installing epel repo
+#      yum: name=epel-release state=present
+#      when: ansible_os_family == "RedHat"
 
     - name: installing ansible
-      yum: name=ansible state=present
+      dnf: name=ansible state=present
       when: ansible_os_family == "RedHat"
 
 #    - name: installing ansible
