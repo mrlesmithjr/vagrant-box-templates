@@ -13,6 +13,6 @@ sudo rm -f /EMPTY
 
 sleep 15s
 
-history -cw
+cat /dev/null > ~/.bash_history && history -c && exit
 
 sudo reboot
