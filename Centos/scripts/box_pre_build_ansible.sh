@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install Ansible to provision host
-sudo yum -y install ansible
+sudo yum -y install ansible libselinux-python
 
 # Run Ansible provisioning
 ansible-playbook -i hosts box_pre_build.yml --connection=local --ask-sudo-pass
