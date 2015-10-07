@@ -15,7 +15,6 @@ Vagrant.configure(2) do |config|
     config.vm.define nodes["name"] do |node|
       node.vm.hostname = nodes["name"]
       node.vm.box = nodes["box"]
-#      node.vm.provision :shell, path: "bootstrap_ansible.sh"
       if nodes["ansible_ssh_host_ip"] != "None"
         node.vm.network "private_network", ip: nodes["ansible_ssh_host_ip"]
       end
@@ -46,8 +45,12 @@ Vagrant.configure(2) do |config|
       end
     end
   end
-  config.vm.provision :ansible do |ansible|
-    ansible.playbook = "bootstrap.yml"
+  if Vagrant::Util::Platform.windows?
+    config.vm.provision :shell, path: "bootstrap_ansible.sh"
+  else
+    config.vm.provision :ansible do |ansible|
+      ansible.playbook = "bootstrap.yml"
+    end
   end
 #  if Vagrant.has_plugin?("vagrant-cachier")
 #    config.cache.scope = :box
