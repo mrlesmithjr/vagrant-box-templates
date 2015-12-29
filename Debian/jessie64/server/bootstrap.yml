@@ -22,9 +22,25 @@
         name: "{{ item }}"
         state: present
       with_items:
+        - git
+      when: ansible_os_family == "Debian"
+
+    - name: debian | installing python packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
         - python-pip
         - python-dev
-      when: ansible_os_family == "Debian"
+      when: ansible_distribution == "Ubuntu"
+
+    - name: debian | installing python packages
+      easy_install:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - pip
+      when: ansible_distribution == "Debian"
 
     - name: installing ansible
       pip:
