@@ -37,7 +37,7 @@
     - name: debian | installing python packages
       easy_install:
         name: "{{ item }}"
-        state: present
+#        state: present
       with_items:
         - pip
       when: ansible_distribution == "Debian"
