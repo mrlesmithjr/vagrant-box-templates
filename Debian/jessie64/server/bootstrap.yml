@@ -17,6 +17,12 @@
         cache_valid_time: 3600
       when: ansible_os_family == "Debian"
 
+    - name: uninstall python-pip (If installed) - Debian
+      apt:
+        name: python-pip
+        state: absent
+      when: ansible_distribution == "Debian"
+
     - name: installing ansible pre-reqs
       apt:
         name: "{{ item }}"
