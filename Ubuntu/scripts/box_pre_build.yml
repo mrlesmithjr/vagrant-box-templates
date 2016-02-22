@@ -107,6 +107,8 @@
     - name: unmounting VirtualBoxAdditions ISO
       mount:
         name: "/mnt/virtualbox"
+        src: "/home/vagrant/{{ virtualbox_guest_additions_iso }}"
+        fstype: iso9660
         state: absent
 
     - name: cleaning up dhcp leases
