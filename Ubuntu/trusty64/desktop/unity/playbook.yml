@@ -3,5 +3,26 @@
   become: true
   vars:
     - pri_domain_name: 'test.vagrant.local'
+    - update_packages: false
   roles:
   tasks:
+    - name: update apt-cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 86400
+      when: >
+            update_packages is defined and
+            update_packages
+
+    - name: upgrading installed packages
+      command: "sudo apt-get -y upgrade"
+      when: >
+            update_packages is defined and
+            update_packages
+
+    - name: auto-removing packages no longer used
+      apt:
+        autoremote: yes
+      when: >
+            update_packages is defined and
+            update_packages
