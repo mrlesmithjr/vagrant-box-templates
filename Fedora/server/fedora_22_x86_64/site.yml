@@ -1,9 +1,0 @@
----
-- hosts: all
-  remote_user: vagrant
-  sudo: true
-  vars:
-  tasks:
-  roles:
-    - mrlesmithjr.bootstrap
-    - mrlesmithjr.base
