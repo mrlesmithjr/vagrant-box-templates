@@ -15,9 +15,9 @@ box = "mrlesmithjr/linuxmint17-amd64-cinnamon"
 desktop = "yes"  #Define if running desktop OS (yes | no)
 linked_clones = "no"  #Defines if nodes should be linked from master VM (yes | no)
 provision_nodes = "no"  #Define if provisioners should run (yes | no)
-server_cpus = "1"  #Define number of CPU cores
-server_memory = "1024"  #Define amount of memory to assign to node(s)
-subnet = "192.168.202."  #Define subnet for private_network
+server_cpus = "2"  #Define number of CPU cores
+server_memory = "4096"  #Define amount of memory to assign to node(s)
+subnet = "192.168.122."  #Define subnet for private_network
 subnet_ip_start = 200  #Define starting last octet of the subnet range to begin addresses for node(s)
 
 Vagrant.configure(2) do |config|
