@@ -1,4 +1,4 @@
-i#!/bin/bash
+#!/bin/bash
 if [ -f /etc/debian_version ]; then
   codename="$(lsb_release -c | awk {'print $2}')"
   if [[ $codename == "vivid" ]]; then
@@ -13,8 +13,7 @@ fi
 if [ -f /etc/redhat-release ]; then
   codename="$(gawk -F= '/^NAME/{print $2}' /etc/os-release)"
   if [[ $codename == "Fedora" ]]; then
-    sudo dnf -y install python-devel python-dnf python-pip && \
+    sudo dnf -y install python-devel python-dnf && \
     sudo dnf -y group install "C Development Tools and Libraries"
   fi
 fi
-

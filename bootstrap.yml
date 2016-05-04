@@ -26,27 +26,7 @@
         - python-dev
         - python-setuptools
       when: >
-            ansible_os_family == "Debian" and
-            ansible_distribution_release == "precise"
-
-    - name: installing python pip
-      easy_install:
-        name: "pip"
-        state: present
-      when: >
-            ansible_os_family == "Debian" and
-            ansible_distribution_release == "precise"
-
-    - name: installing ansible pre-reqs (Debian)
-      apt:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - python-dev
-        - python-pip
-      when: >
-            ansible_os_family == "Debian" and
-            ansible_distribution_release != "precise"
+            ansible_os_family == "Debian"
 
     - name: installing epel repo (RedHat)
       yum:
@@ -61,28 +41,14 @@
         name: "{{ item }}"
         state: present
       with_items:
+        - libffi-devel
+        - openssl-devel
+        - python-crypto
         - python-devel
-#        - python-dnf
-        - python-pip
-#      when: >
-#            (ansible_os_family == "RedHat" and
-#            ansible_distribution != "Fedora" and
-#            ansible_distribution_version | version_compare('7', '>='))
+        - python-setuptools
       when: >
-            (ansible_os_family == "RedHat" and
-            ansible_distribution != "Fedora")
-
-#    - name: installing ansible pre-reqs (RedHat)
-#      yum:
-#        name: "{{ item }}"
-#        state: present
-#      with_items:
-#        - python-devel
-#        - python-pip
-#      when: >
-#            (ansible_os_family == "RedHat" and
-#            ansible_distribution != "Fedora" and
-#            ansible_distribution_version | version_compare('7', '<'))
+            ansible_os_family == "RedHat" and
+            ansible_distribution != "Fedora"
 
     - name: installing ansible pre-reqs (Fedora)
       dnf:
@@ -90,10 +56,13 @@
         state: present
       with_items:
         - gmp-devel
+        - libffi-devel
+        - openssl-devel
         - python-crypto
         - python-devel
         - python-dnf
-        - python-pip
+        - python-setuptools
+        - redhat-rpm-config
       when: >
             ansible_os_family == "RedHat" and
             ansible_distribution == "Fedora"
@@ -108,18 +77,16 @@
       when: >
             ansible_os_family == "openSUSE Leap"
 
-    - name: installing ansible
-      pip:
-        name: "ansible"
+    - name: installing python pip
+      easy_install:
+        name: "pip"
         state: present
-        version: 1.9.6
-      when: ansible_distribution_release == "precise"
 
     - name: installing ansible
       pip:
         name: "ansible"
         state: present
-      when: ansible_distribution_release != "precise"
+        version: 1.9.6
 
     - name: ensuring host_vars directory exists
       file:
@@ -207,4 +174,3 @@
       when: >
             update_host_vars is defined and
             update_host_vars
-
