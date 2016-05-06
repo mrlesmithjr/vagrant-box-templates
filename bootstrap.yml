@@ -72,8 +72,12 @@
         name: "{{ item }}"
         state: present
       with_items:
+        - gmp-devel
+        - libffi-devel
+        - openssl-devel
+        - python-crypto
         - python-devel
-        - python-pip
+        - python-setuptools
       when: >
             ansible_os_family == "openSUSE Leap"
 
