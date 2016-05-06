@@ -9,6 +9,21 @@
 # ---- Define number of nodes to spin up ----
 N = 1
 
+# ---- Define any custom memory/cpu requirement ----
+# if custom requirements are desired...ensure to set
+# custom_cpu_mem == "yes" otherwise set to "no"
+# By default if custom requirements are defined and set below
+# any node not defined will be configured as the default...
+# which is 1vCPU/512mb...So if setting custom requirements
+# only define any node which requires more than the defaults.
+nodes = [
+  {
+    :node => "node0",
+    :cpu => 1,
+    :mem => 4096
+  }
+]
+
 # ---- Define variables below ----
 additional_disks = "no"  #Define if additional drives defined should be added (yes | no)
 additional_disks_controller = "SATA Controller"
@@ -17,6 +32,7 @@ additional_disks_size = 10  #Define disk size in GB
 additional_nics = "no"  #Define if additional network adapters should be created (yes | no)
 additional_nics_num = 1  #Define the number of additional nics to add
 box = "mrlesmithjr/xenial64"  #Define Vagrant box to load
+custom_cpu_mem = "no"  #Define if custom cpu and memory requirements are needed (yes| no)...defined within nodes variable above
 desktop = "no"  #Define if running desktop OS (yes | no)
 enable_port_forwards = "no"  #Define if port forwards should be enabled
 linked_clones = "no"  #Defines if nodes should be linked from master VM (yes | no)
@@ -25,14 +41,11 @@ port_forwards = [
     :node => "node0",
     :guest => 80,
     :host => 8080
-  },
-    :node => "node1",
-    :guest => 3000,
-    :host => 3000
+  }
 ]
 provision_nodes = "no"  #Define if provisioners should run (yes | no)
-server_cpus = 1  #Define number of CPU cores
-server_memory = 1024  #Define amount of memory to assign to node(s)
+server_cpus = 1  #Define number of CPU cores...will be ignored if custom_cpu_mem == "yes"
+server_memory = 512  #Define amount of memory to assign to node(s)...will be ignored if custom_cpu_mem == "yes"
 subnet = "192.168.202."  #Define subnet for private_network
 subnet_ip_start = 200  #Define starting last octet of the subnet range to begin addresses for node(s)
 
@@ -48,8 +61,18 @@ Vagrant.configure(2) do |config|
         if linked_clones == "yes"
           vb.linked_clone = true
         end
-        vb.customize ["modifyvm", :id, "--cpus", server_cpus]
-        vb.customize ["modifyvm", :id, "--memory", server_memory]
+        if custom_cpu_mem == "no"
+          vb.customize ["modifyvm", :id, "--cpus", server_cpus]
+          vb.customize ["modifyvm", :id, "--memory", server_memory]
+        end
+        if custom_cpu_mem == "yes"
+          nodes.each do |cust_node|
+            if cust_node[:node] == "node#{nid}"
+              vb.customize ["modifyvm", :id, "--cpus", cust_node[:cpu]]
+              vb.customize ["modifyvm", :id, "--memory", cust_node[:mem]]
+            end
+          end
+        end
         if desktop == "yes"
           vb.gui = true
           vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
@@ -98,12 +121,7 @@ Vagrant.configure(2) do |config|
             ansible.playbook = "playbook.yml"
             ansible.groups = {
               "test-nodes" => [
-                "node0",
-                "node1",
-                "node2"
-              ],
-              "prod-nodes" => [
-                "node3"
+                "node0"
               ]
             }
           end
