@@ -19,8 +19,9 @@ N = 1
 nodes = [
   {
     :node => "node0",
+    :box => "mrlesmithjr/trusty64",
     :cpu => 1,
-    :mem => 4096
+    :mem => 1024
   }
 ]
 
@@ -30,23 +31,39 @@ additional_disks_controller = "SATA Controller"
 additional_disks_num = 1  #Define the number of additional disks to add
 additional_disks_size = 10  #Define disk size in GB
 additional_nics = "no"  #Define if additional network adapters should be created (yes | no)
+additional_nics_dhcp = "yes"  #Define if additional network adapters should be DHCP assigned
 additional_nics_num = 1  #Define the number of additional nics to add
+ansible_groups = {
+  "test-nodes" => ["node[0:#{N-1}]"]
+}
 box = "mrlesmithjr/trusty64-desktop-gnome"  #Define Vagrant box to load
 custom_cpu_mem = "no"  #Define if custom cpu and memory requirements are needed (yes| no)...defined within nodes variable above
 desktop = "yes"  #Define if running desktop OS (yes | no)
+enable_custom_boxes = "no"  #Define if custom boxes should be used...defined in nodes var..
 enable_port_forwards = "no"  #Define if port forwards should be enabled
 linked_clones = "no"  #Defines if nodes should be linked from master VM (yes | no)
 port_forwards = [
   {
     :node => "node0",
+    :guest => 3306,
+    :host => 3306
+  },
+  {
+    :node => "node0",
     :guest => 80,
     :host => 8080
+  },
+  {
+    :node => "node0",
+    :guest => 8000,
+    :host => 8000
   }
 ]
 provision_nodes = "no"  #Define if provisioners should run (yes | no)
+random_ips = "no"  #Define if IP's are random assigned if not DHCP
 server_cpus = 1  #Define number of CPU cores...will be ignored if custom_cpu_mem == "yes"
 server_memory = 1024  #Define amount of memory to assign to node(s)...will be ignored if custom_cpu_mem == "yes"
-subnet = "192.168.202."  #Define subnet for private_network
+subnet = "192.168.202."  #Define subnet for private_network (If not using DHCP)
 subnet_ip_start = 200  #Define starting last octet of the subnet range to begin addresses for node(s)
 
 Vagrant.configure(2) do |config|
@@ -56,7 +73,21 @@ Vagrant.configure(2) do |config|
     nid = (node_id - 1)
 
     config.vm.define "node#{nid}" do |node|
-      node.vm.box = box
+      if enable_custom_boxes == "yes"
+        box_set = "no"  #Initially set to no so it can be set to true if found in custom box defined
+        nodes.each do |cust_box|
+          if cust_box[:node] == "node#{nid}"
+            node.vm.box = cust_box[:box]
+            box_set = "yes"
+          end
+        end
+        if box_set == "no"
+          node.vm.box = box
+        end
+      end
+      if enable_custom_boxes == "no"
+        node.vm.box = box
+      end
       node.vm.provider "virtualbox" do |vb|
         if linked_clones == "yes"
           vb.linked_clone = true
@@ -96,9 +127,21 @@ Vagrant.configure(2) do |config|
 
       ### Define additional network adapters below
       if additional_nics == "yes"
-        (1..additional_nics_num).each do |nic_num|
-          nnum = Random.rand(0..50)
-          node.vm.network :private_network, ip: subnet+"#{subnet_ip_start + nid + nnum}"
+        if additional_nics_dhcp == "no"
+          (1..additional_nics_num).each do |nic_num|
+            if random_ips == "yes"
+              nnum = Random.rand(0..50)
+              node.vm.network :private_network, ip: subnet+"#{subnet_ip_start + nid + nnum}"
+            end
+            if random_ips == "no"
+              node.vm.network :private_network, ip: subnet+"#{subnet_ip_start + nid}"
+            end
+          end
+        end
+        if additional_nics_dhcp == "yes"
+          (1..additional_nics_num).each do |nic_num|
+            node.vm.network :private_network, type: "dhcp"
+          end
         end
       end
 
@@ -119,11 +162,7 @@ Vagrant.configure(2) do |config|
           node.vm.provision "ansible" do |ansible|  #runs Ansible playbook for installing roles/executing tasks
             ansible.limit = "all"
             ansible.playbook = "playbook.yml"
-            ansible.groups = {
-              "test-nodes" => [
-                "node0"
-              ]
-            }
+            ansible.groups = ansible_groups
           end
         end
       end
