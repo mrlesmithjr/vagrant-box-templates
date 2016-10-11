@@ -196,8 +196,8 @@ Vagrant.configure(2) do |config|
       if enable_port_forwards
         port_forwards.each do |pf|
           if pf[:node] == "node#{nid}"
-            node.vm.network "forwarded_port", guest: pf[:guest], \
-            host: pf[:host] + nid
+            node.vm.network :forwarded_port, guest: pf[:guest], \
+            host: pf[:host]
           end
         end
       end
