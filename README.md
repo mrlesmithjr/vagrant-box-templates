@@ -42,10 +42,17 @@ You will need to install the roles on your host machine which can be done by:
 ````
 sudo ansible-galaxy install -r requirements.yml -f
 ````
-And when you are all done with your Vagrant node(s) you can tear everything down and cleanup easily by running the following:
-````
+And when you are all done with your Vagrant node(s) you can tear everything down
+and cleanup easily by running the following:
+
+`Non-Windows`
+```
 ./cleanup.sh
-````
+```
+`Windows`
+```
+cleanup.bat
+```
 
 License
 -------
