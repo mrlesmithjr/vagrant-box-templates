@@ -90,7 +90,7 @@
       pip:
         name: "ansible"
         state: present
-        version: 1.9.6
+        version: 2.2.0.0
 
     - name: ensuring host_vars directory exists
       file:
