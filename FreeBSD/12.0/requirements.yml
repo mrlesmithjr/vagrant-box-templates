@@ -1,0 +1,10 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-base.git
+- src: https://github.com/mrlesmithjr/ansible-bashrc.git
+- src: https://github.com/mrlesmithjr/ansible-bootstrap.git
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts.git
+- src: https://github.com/mrlesmithjr/ansible-hashicorp-toolbox.git
+- src: https://github.com/mrlesmithjr/ansible-ntp.git
+- src: https://github.com/mrlesmithjr/ansible-rsyslog.git
+- src: https://github.com/mrlesmithjr/ansible-timezone.git
+- src: https://github.com/mrlesmithjr/ansible-users.git
