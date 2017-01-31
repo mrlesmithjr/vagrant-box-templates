@@ -79,7 +79,7 @@
         - python-devel
         - python-setuptools
       when: >
-            ansible_os_family == "openSUSE Leap"
+            ansible_os_family == "Suse"
 
     - name: installing python pip
       easy_install:

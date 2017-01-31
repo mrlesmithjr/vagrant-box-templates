@@ -1,0 +1,7 @@
+---
+- hosts: test-nodes
+  become: true
+  vars:
+    - pri_domain_name: 'test.vagrant.local'
+  roles:
+  tasks:
