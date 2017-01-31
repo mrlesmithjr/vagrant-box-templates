@@ -74,6 +74,7 @@ Vagrant.configure(2) do |config|
       node.vm.provider "virtualbox" do |vb|
         vb.memory = node_id['mem']
         vb.cpus = node_id['vcpu']
+
         # Setup desktop environment
         if not node_id['desktop'].nil?
           if node_id['desktop']
@@ -100,7 +101,6 @@ Vagrant.configure(2) do |config|
             vb.customize ['storageattach', :id,  '--storagectl', \
               "#{disk_num['controller']}", '--port', dnum, '--device', 0, \
               '--type', 'hdd', '--medium', "#{ddev}"]
-
           end
         end
       end
@@ -160,10 +160,13 @@ Vagrant.configure(2) do |config|
           end
         end
       end
+
     end
   end
+
+  #runs initial shell script
   if provision_nodes
-    #runs initial shell script
     config.vm.provision :shell, path: "bootstrap.sh", keep_color: "true"
   end
+
 end
