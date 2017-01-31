@@ -68,6 +68,9 @@ Vagrant.configure(2) do |config|
 
   #Iterate over nodes
   nodes.each do |node_id|
+    # Below is needed if not using Guest Additions
+    # config.vm.synced_folder ".", "/vagrant", type: "rsync",
+    #   rsync__exclude: "hosts"
     config.vm.define node_id['name'] do |node|
       node.vm.box = node_id['box']
       node.vm.hostname = node_id['name']
