@@ -16,7 +16,7 @@ nodes = YAML.load_file(File.join(File.dirname(__FILE__), 'nodes.yml'))
 # Define global variables
 #
 # Define if provisioners should run (true|false)
-provision_nodes = true
+provision_nodes = false
 
 
 Vagrant.configure(2) do |config|
