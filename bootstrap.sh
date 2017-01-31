@@ -17,6 +17,10 @@ if [ -f /etc/debian_version ]; then
     sudo apt-get update && \
     sudo apt-get -y install python-simplejson
   fi
+  if [[ $codename == "zesty" ]]; then
+    sudo apt-get update && \
+    sudo apt-get -y install python-simplejson
+  fi
 fi
 if [ -f /etc/redhat-release ]; then
   if [ -f /etc/os-release ]; then

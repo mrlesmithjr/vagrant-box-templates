@@ -1,3 +1,4 @@
 *.retry
 .vagrant/
 ubuntu-yakkety-16.10-cloudimg-console.log
+ubuntu-zesty-17.04-cloudimg-console.log

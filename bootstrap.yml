@@ -21,6 +21,7 @@
         name: "{{ item }}"
         state: present
       with_items:
+        - build-essential
         - libffi-dev
         - libssl-dev
         - python-dev
