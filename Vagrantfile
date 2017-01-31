@@ -74,6 +74,17 @@ Vagrant.configure(2) do |config|
       node.vm.provider "virtualbox" do |vb|
         vb.memory = node_id['mem']
         vb.cpus = node_id['vcpu']
+        # Setup desktop environment
+        if not node_id['desktop'].nil?
+          if node_id['desktop']
+            vb.gui = true
+            vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+            vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+            vb.customize ["modifyvm", :id, "--ioapic", "on"]
+            vb.customize ["modifyvm", :id, "--vram", "128"]
+            vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
+          end
+        end
 
         # Add additional disk(s)
         if not node_id['disks'].nil?
@@ -89,18 +100,6 @@ Vagrant.configure(2) do |config|
             vb.customize ['storageattach', :id,  '--storagectl', \
               "#{disk_num['controller']}", '--port', dnum, '--device', 0, \
               '--type', 'hdd', '--medium', "#{ddev}"]
-
-            # Setup desktop environment
-            if not node_id['desktop'].nil?
-              if node_id['desktop']
-                vb.gui = true
-                vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
-                vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
-                vb.customize ["modifyvm", :id, "--ioapic", "on"]
-                vb.customize ["modifyvm", :id, "--vram", "128"]
-                vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
-              end
-            end
 
           end
         end
