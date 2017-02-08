@@ -2,7 +2,7 @@
 - name: 'node0'
   ansible_groups:
     - 'test-nodes'
-  box: 'ubuntu/xenial64'
+  box: 'mrlesmithjr/xenial64'
   desktop: false
   # disks:
   #   - size: '10'
