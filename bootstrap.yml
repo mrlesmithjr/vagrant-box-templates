@@ -3,11 +3,11 @@
   remote_user: vagrant
   become: true
   vars:
-    - host_vars_directory: './host_vars'
-    - host_vars_file: '{{ host_vars_directory }}/{{ inventory_hostname }}.yml'
-    - pri_domain_name: 'vagrant.local'
-    - ssh_key_path: '.vagrant/machines/{{ inventory_hostname }}/virtualbox/private_key'
-    - update_host_vars: true
+    host_vars_directory: './host_vars'
+    host_vars_file: '{{ host_vars_directory }}/{{ inventory_hostname }}.yml'
+    pri_domain_name: 'vagrant.local'
+    ssh_key_path: '.vagrant/machines/{{ inventory_hostname }}/virtualbox/private_key'
+    update_host_vars: true
   roles:
   tasks:
     - name: updating apt cache (Debian)
@@ -120,6 +120,34 @@
       become: false
       when: not host_var.stat.exists
 
+    - name: updating ansible_ssh_host
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_host{{ ':' }}"
+        line: "ansible_ssh_host{{ ':' }} {{ ansible_eth1.ipv4.address }}"
+      delegate_to: localhost
+      become: false
+      register: "ansible_host_updated"
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            (ansible_eth1 is defined and
+            ansible_eth1.ipv4.address is defined)
+
+    - name: updating ansible_ssh_host
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_host{{ ':' }}"
+        line: "ansible_ssh_host{{ ':' }} {{ ansible_enp0s8.ipv4.address }}"
+      delegate_to: localhost
+      become: false
+      register: "ansible_host_updated"
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            (ansible_enp0s8 is defined and
+            ansible_enp0s8.ipv4.address is defined)
+
     - name: updating ansible_ssh_port
       lineinfile:
         dest: "{{ host_vars_file }}"
@@ -129,33 +157,7 @@
       become: false
       when: >
             (update_host_vars is defined and
-            update_host_vars) and
-            (ansible_eth1 is defined or
-            ansible_enp0s8 is defined)
-
-    - name: updating ansible_ssh_host
-      lineinfile:
-        dest: "{{ host_vars_file }}"
-        regexp: "^ansible_ssh_host{{ ':' }}"
-        line: "ansible_ssh_host{{ ':' }} {{ ansible_eth1.ipv4.address }}"
-      delegate_to: localhost
-      become: false
-      when: >
-            (update_host_vars is defined and
-            update_host_vars) and
-            ansible_eth1 is defined
-
-    - name: updating ansible_ssh_host
-      lineinfile:
-        dest: "{{ host_vars_file }}"
-        regexp: "^ansible_ssh_host{{ ':' }}"
-        line: "ansible_ssh_host{{ ':' }} {{ ansible_enp0s8.ipv4.address }}"
-      delegate_to: localhost
-      become: false
-      when: >
-            (update_host_vars is defined and
-            update_host_vars) and
-            ansible_enp0s8 is defined
+            update_host_vars)
 
     - name: updating ansible_ssh_key
       lineinfile:
