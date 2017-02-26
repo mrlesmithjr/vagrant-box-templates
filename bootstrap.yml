@@ -19,20 +19,20 @@
     - name: installing ansible pre-reqs (Debian)
       apt:
         name: "{{ item }}"
-        state: present
+        state: "present"
       with_items:
-        - build-essential
-        - libffi-dev
-        - libssl-dev
-        - python-dev
-        - python-setuptools
+        - 'build-essential'
+        - 'libffi-dev'
+        - 'libssl-dev'
+        - 'python-dev'
+        - 'python-setuptools'
       when: >
             ansible_os_family == "Debian"
 
     - name: installing epel repo (RedHat)
       yum:
         name: "epel-release"
-        state: present
+        state: "present"
       when: >
             ansible_os_family == "RedHat" and
             ansible_distribution != "Fedora"
@@ -40,13 +40,13 @@
     - name: installing ansible pre-reqs (RedHat)
       yum:
         name: "{{ item }}"
-        state: present
+        state: "present"
       with_items:
-        - libffi-devel
-        - openssl-devel
-        - python-crypto
-        - python-devel
-        - python-setuptools
+        - 'libffi-devel'
+        - 'openssl-devel'
+        - 'python-crypto'
+        - 'python-devel'
+        - 'python-setuptools'
       when: >
             ansible_os_family == "RedHat" and
             ansible_distribution != "Fedora"
@@ -56,14 +56,14 @@
         name: "{{ item }}"
         state: present
       with_items:
-        - gmp-devel
-        - libffi-devel
-        - openssl-devel
-        - python-crypto
-        - python-devel
-        - python-dnf
-        - python-setuptools
-        - redhat-rpm-config
+        - 'gmp-devel'
+        - 'libffi-devel'
+        - 'openssl-devel'
+        - 'python-crypto'
+        - 'python-devel'
+        - 'python-dnf'
+        - 'python-setuptools'
+        - 'redhat-rpm-config'
       when: >
             ansible_os_family == "RedHat" and
             ansible_distribution == "Fedora"
@@ -73,40 +73,42 @@
         name: "{{ item }}"
         state: present
       with_items:
-        - gmp-devel
-        - libffi-devel
-        - openssl-devel
-        - python-crypto
-        - python-devel
-        - python-setuptools
+        - 'gmp-devel'
+        - 'libffi-devel'
+        - 'openssl-devel'
+        - 'python-crypto'
+        - 'python-devel'
+        - 'python-setuptools'
       when: >
             ansible_os_family == "Suse"
 
     - name: installing python pip
       easy_install:
         name: "pip"
-        state: present
+        state: "present"
 
     - name: installing ansible
       pip:
         name: "ansible"
-        state: present
-        version: 2.2.0.0
+        state: "present"
+        version: "2.2.0.0"
 
     - name: ensuring host_vars directory exists
       file:
         path: "./host_vars"
-        state: directory
-      delegate_to: localhost
+        state: "directory"
+      delegate_to: "localhost"
       run_once: true
       become: false
-      when: update_host_vars is defined and update_host_vars
+      when: >
+            update_host_vars is defined and
+            update_host_vars
 
     - name: ensuring host file exists in host_vars
       stat:
         path: "{{ host_vars_file }}"
-      delegate_to: localhost
-      register: host_var
+      delegate_to: "localhost"
+      register: "host_var"
       become: false
       when: >
             update_host_vars is defined and
@@ -115,8 +117,8 @@
     - name: creating missing host_vars
       file:
         path: "{{ host_vars_file }}"
-        state: touch
-      delegate_to: localhost
+        state: "touch"
+      delegate_to: "localhost"
       become: false
       when: not host_var.stat.exists
 
@@ -125,9 +127,9 @@
         dest: "{{ host_vars_file }}"
         regexp: "^ansible_ssh_host{{ ':' }}"
         line: "ansible_ssh_host{{ ':' }} {{ ansible_eth1.ipv4.address }}"
-      delegate_to: localhost
+      delegate_to: "localhost"
       become: false
-      register: "ansible_host_updated"
+      register: "ansible_host_updated_eth1"
       when: >
             (update_host_vars is defined and
             update_host_vars) and
@@ -139,9 +141,9 @@
         dest: "{{ host_vars_file }}"
         regexp: "^ansible_ssh_host{{ ':' }}"
         line: "ansible_ssh_host{{ ':' }} {{ ansible_enp0s8.ipv4.address }}"
-      delegate_to: localhost
+      delegate_to: "localhost"
       become: false
-      register: "ansible_host_updated"
+      register: "ansible_host_updated_enp0s8"
       when: >
             (update_host_vars is defined and
             update_host_vars) and
@@ -153,18 +155,20 @@
         dest: "{{ host_vars_file }}"
         regexp: "^ansible_ssh_port{{ ':' }}"
         line: "ansible_ssh_port{{ ':' }} 22"
-      delegate_to: localhost
+      delegate_to: "localhost"
       become: false
       when: >
             (update_host_vars is defined and
-            update_host_vars)
+            update_host_vars) and
+            (ansible_host_updated_eth1.changed or
+              ansible_host_updated_enp0s8.changed)
 
     - name: updating ansible_ssh_key
       lineinfile:
         dest: "{{ host_vars_file }}"
         regexp: "^ansible_ssh_private_key_file{{ ':' }}"
         line: "ansible_ssh_private_key_file{{ ':' }} {{ ssh_key_path }}"
-      delegate_to: localhost
+      delegate_to: "localhost"
       become: false
       when: >
             update_host_vars is defined and
@@ -175,8 +179,8 @@
         dest: "{{ host_vars_file }}"
         regexp: "---"
         line: "---"
-        insertbefore: BOF
-      delegate_to: localhost
+        insertbefore: "BOF"
+      delegate_to: "localhost"
       become: false
       when: >
             update_host_vars is defined and
