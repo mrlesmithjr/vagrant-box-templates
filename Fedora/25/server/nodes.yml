@@ -2,7 +2,7 @@
 - name: 'node0'
   ansible_groups:
     - 'test-nodes'
-  box: 'fedora/25-cloud-base'
+  box: 'mrlesmithjr/fedora-25'
   desktop: false
   # disks:
   #   - size: '10'
