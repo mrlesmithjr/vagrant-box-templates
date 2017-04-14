@@ -2,7 +2,7 @@
 - name: 'node0'
   ansible_groups:
     - 'test-nodes'
-  box: 'ubuntu/zesty64'
+  box: 'mrlesmithjr/zesty64'
   desktop: false
   # disks:
   #   - size: '10'
