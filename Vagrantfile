@@ -15,9 +15,6 @@ nodes = YAML.load_file(File.join(File.dirname(__FILE__), 'nodes.yml'))
 
 # Define global variables
 #
-# Define if provisioners should run (true|false)
-provision_nodes = false
-
 
 Vagrant.configure(2) do |config|
   # Iterate over nodes to get a count
@@ -148,28 +145,26 @@ Vagrant.configure(2) do |config|
       end
 
       # Provisioners
-      if provision_nodes
-        if node_id == num_nodes
-          node.vm.provision "ansible" do |ansible|
-            ansible.limit = "all"
-            #runs bootstrap Ansible playbook
-            ansible.playbook = "bootstrap.yml"
-          end
-          node.vm.provision "ansible" do |ansible|
-            ansible.limit = "all"
-            #runs Ansible playbook for installing roles/executing tasks
-            ansible.playbook = "playbook.yml"
-            ansible.groups = ansible_groups
+      if not node_id['provision'].nil?
+        if node_id['provision']
+          #runs initial shell script
+          config.vm.provision :shell, path: "bootstrap.sh", keep_color: "true"
+          if node_id == num_nodes
+            node.vm.provision "ansible" do |ansible|
+              ansible.limit = "all"
+              #runs bootstrap Ansible playbook
+              ansible.playbook = "bootstrap.yml"
+            end
+            node.vm.provision "ansible" do |ansible|
+              ansible.limit = "all"
+              #runs Ansible playbook for installing roles/executing tasks
+              ansible.playbook = "playbook.yml"
+              ansible.groups = ansible_groups
+            end
           end
         end
       end
-
     end
-  end
 
-  #runs initial shell script
-  if provision_nodes
-    config.vm.provision :shell, path: "bootstrap.sh", keep_color: "true"
   end
-
 end

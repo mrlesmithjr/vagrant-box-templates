@@ -7,9 +7,9 @@ desired. Some distros also include Desktop versions.
 Requirements
 ------------
 
-Ansible (http://www.ansible.com/home)  
-VirtualBox (https://www.virtualbox.org/)  
-Vagrant (https://www.vagrantup.com/)
+- [Ansible]
+- [Vagrant]
+- [Virtualbox]
 
 Usage
 -----
@@ -47,6 +47,7 @@ uncomment those sections and adjust them as needed.
   #     method: 'static'
   #     network_name: 'network-1'
   mem: '512'
+  provision: false
   vcpu: '1'
   # port_forwards:
   #   - guest: '80'
@@ -75,12 +76,34 @@ install the roles on your host machine which can be done by:
 sudo ansible-galaxy install -r requirements.yml -f
 ```
 If you would like to provision the nodes when they startup you will need to
-set `provision_nodes = true` in the `Vagrantfile` in the root folder.
+set `provision: true` in the `nodes.yml`.
 ```
-# Define global variables
-#
-# Define if provisioners should run (true|false)
-provision_nodes = true
+- name: 'node0'
+  ansible_groups:
+    - 'test-nodes'
+  box: 'mrlesmithjr/xenial64'
+  desktop: false
+  # disks:
+  #   - size: '10'
+  #     controller: "SATA Controller"
+  #   - size: '10'
+  #     controller: "SATA Controller"
+  # interfaces:
+  #   - ip: '192.168.250.10'
+  #     auto_config: true
+  #     method: 'static'
+  #   - ip: '192.168.1.10'
+  #     auto_config: false
+  #     method: 'static'
+  #     network_name: 'network-1'
+  mem: '512'
+  provision: true
+  vcpu: '1'
+  # port_forwards:
+  #   - guest: '80'
+  #     host: '8080'
+  #   - guest: '443'
+  #     host: '4433'
 ```
 Most files are symlinked into each distro folder to keep a consistent and easy
 method of changing things around. Feel free to change as needed.
@@ -109,3 +132,7 @@ Larry Smith Jr.
 - @mrlesmithjr
 - http://everythingshouldbevirtual.com
 - mrlesmithjr [at] gmail.com
+
+[Ansible]: <https://www.ansible.com>
+[Vagrant]: <https://www.vagrantup.com/>
+[Virtualbox]: <https://www.virtualbox.org/>
