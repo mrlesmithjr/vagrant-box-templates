@@ -69,6 +69,11 @@ Vagrant.configure(2) do |config|
     # config.vm.synced_folder ".", "/vagrant", type: "rsync",
     #   rsync__exclude: "hosts"
     config.vm.define node_id['name'] do |node|
+      if not node_id['synced_folder'].nil?
+        if not node_id['synced_folder']['type'].nil?
+          config.vm.synced_folder ".", "/vagrant", type: node_id['synced_folder']['type']
+        end
+      end
       node.vm.box = node_id['box']
       node.vm.hostname = node_id['name']
       node.vm.provider "virtualbox" do |vb|

@@ -13,3 +13,4 @@ do
     ln -s $TOP_FOLDER_PATH/$i .
   fi
 done
+ln -sf .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory hosts

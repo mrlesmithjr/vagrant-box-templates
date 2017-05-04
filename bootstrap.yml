@@ -1,8 +1,12 @@
 ---
 - hosts: all
   remote_user: vagrant
-  become: true
   vars:
+    alpine_packages:
+      - 'alpine-sdk'
+      - 'libffi-dev'
+      - 'openssl-dev'
+      - 'py-setuptools'
     ansible_ver: '2.2.0.0'
     debian_packages:
       - 'build-essential'
@@ -40,13 +44,48 @@
       apt:
         update_cache: yes
         cache_valid_time: 3600
+      become: true
       when: ansible_os_family == "Debian"
+
+# Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Alpine)
+      apk:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items: '{{ alpine_packages }}'
+      when: ansible_os_family == "Alpine"
+
+    - name: Installing Python Packages (Alpine)
+      apk:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items:
+        - 'py-pip'
+        - 'python-dev'
+      when: >
+            ansible_os_family == "Alpine" and
+            ansible_distribution_version < '3.5'
+
+    - name: Installing Python Packages (Alpine)
+      apk:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items:
+        - 'py2-pip'
+        - 'python2-dev'
+      when: >
+            ansible_os_family == "Alpine" and
+            ansible_distribution_version >= '3.5'
 
 # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (Debian)
       apt:
         name: "{{ item }}"
         state: "present"
+      become: true
       with_items: '{{ debian_packages }}'
       when: ansible_os_family == "Debian"
 
@@ -54,6 +93,7 @@
       yum:
         name: "epel-release"
         state: "present"
+      become: true
       when: >
             ansible_os_family == "RedHat" and
             ansible_distribution != "Fedora"
@@ -63,6 +103,7 @@
       yum:
         name: "{{ item }}"
         state: "present"
+      become: true
       with_items: '{{ redhat_packages }}'
       when: >
             ansible_os_family == "RedHat" and
@@ -73,6 +114,7 @@
       dnf:
         name: "python-dnf"
         state: "present"
+      become: true
       when: >
             ansible_os_family == "RedHat" and
             ansible_distribution == "Fedora"
@@ -82,6 +124,7 @@
       dnf:
         name: "{{ item }}"
         state: "present"
+      become: true
       with_items: '{{ redhat_packages }}'
       when: >
             ansible_os_family == "RedHat" and
@@ -92,6 +135,7 @@
       zypper:
         name: "{{ item }}"
         state: "present"
+      become: true
       with_items: '{{ suse_packages }}'
       when: ansible_os_family == "Suse"
 
@@ -100,6 +144,7 @@
       pip:
         name: "{{ item }}"
         state: "latest"
+      become: true
       with_items:
         - 'pip'
         - 'cffi'
@@ -110,6 +155,7 @@
         name: "ansible"
         state: "present"
         version: "{{ ansible_ver }}"
+      become: true
 
 # Check/create host_vars on localhost
     - name: Ensuring host_vars Directory Exists
@@ -139,35 +185,56 @@
         state: "touch"
       delegate_to: "localhost"
       become: false
-      when: not host_var.stat.exists
+      when: not host_var['stat']['exists']
 
     - name: Updating ansible_ssh_host
       lineinfile:
         dest: "{{ host_vars_file }}"
         regexp: "^ansible_ssh_host{{ ':' }}"
-        line: "ansible_ssh_host{{ ':' }} {{ ansible_eth1.ipv4.address }}"
+        line: "ansible_ssh_host{{ ':' }} {{ ansible_eth1['ipv4']['address'] }}"
       delegate_to: "localhost"
       become: false
       register: "ansible_host_updated_eth1"
       when: >
+            ansible_os_family != "Alpine" and
             (update_host_vars is defined and
             update_host_vars) and
             (ansible_eth1 is defined and
-            ansible_eth1.ipv4.address is defined)
+            ansible_eth1['ipv4']['address'] is defined)
 
     - name: Updating ansible_ssh_host
       lineinfile:
         dest: "{{ host_vars_file }}"
         regexp: "^ansible_ssh_host{{ ':' }}"
-        line: "ansible_ssh_host{{ ':' }} {{ ansible_enp0s8.ipv4.address }}"
+        line: "ansible_ssh_host{{ ':' }} {{ ansible_enp0s8['ipv4']['address'] }}"
       delegate_to: "localhost"
       become: false
       register: "ansible_host_updated_enp0s8"
       when: >
+            ansible_os_family != "Alpine" and
             (update_host_vars is defined and
             update_host_vars) and
             (ansible_enp0s8 is defined and
-            ansible_enp0s8.ipv4.address is defined)
+            ansible_enp0s8['ipv4']['address'] is defined)
+
+    - name: Capturing eth1 IP Address (Alpine)
+      shell: "ifconfig eth1 | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}'"
+      register: "_alpine_eth1_ip"
+      become: true
+      when: ansible_os_family == "Alpine"
+
+    - name: Updating ansible_ssh_host (Alpine)
+      lineinfile:
+        dest: "{{ host_vars_file }}"
+        regexp: "^ansible_ssh_host{{ ':' }}"
+        line: "ansible_ssh_host{{ ':' }} {{ _alpine_eth1_ip['stdout'] }}"
+      delegate_to: "localhost"
+      become: false
+      register: "ansible_host_updated_alpine"
+      when: >
+            (update_host_vars is defined and
+            update_host_vars) and
+            ansible_os_family == "Alpine"
 
     - name: Updating ansible_ssh_port
       lineinfile:
@@ -179,8 +246,9 @@
       when: >
             (update_host_vars is defined and
             update_host_vars) and
-            (ansible_host_updated_eth1.changed or
-              ansible_host_updated_enp0s8.changed)
+            (ansible_host_updated_eth1['changed'] or
+              ansible_host_updated_enp0s8['changed'] or
+              ansible_host_updated_alpine['changed'])
 
     - name: Updating ansible_ssh_key
       lineinfile:
