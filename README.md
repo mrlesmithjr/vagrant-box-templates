@@ -11,6 +11,43 @@ Requirements
 - [Vagrant]
 - [Virtualbox]
 
+- For using [Alpine] boxes the `vagrant-alpine` plugin is **required**.
+
+  `vagrant plugin install vagrant-alpine`
+
+- Also for [Alpine] boxes, they use `NFS` for their `/vagrant` synced_folder.
+  This means you will be prompted for `sudo` password when spinning up a box.
+  This can be changed to not prompt by references
+  [here](https://www.vagrantup.com/docs/synced-folders/nfs.html).
+
+  **tl;dr**
+
+  For `OS X`, `sudoers` should have this entry:
+  ```
+  Cmnd_Alias VAGRANT_EXPORTS_ADD = /usr/bin/tee -a /etc/exports
+  Cmnd_Alias VAGRANT_NFSD = /sbin/nfsd restart
+  Cmnd_Alias VAGRANT_EXPORTS_REMOVE = /usr/bin/sed -E -e /*/ d -ibak /etc/exports
+  %admin ALL=(root) NOPASSWD: VAGRANT_EXPORTS_ADD, VAGRANT_NFSD, VAGRANT_EXPORTS_REMOVE
+  ```
+  For `Ubuntu Linux` , `sudoers` should look like this:
+  ```
+  Cmnd_Alias VAGRANT_EXPORTS_CHOWN = /bin/chown 0\:0 /tmp/*
+  Cmnd_Alias VAGRANT_EXPORTS_MV = /bin/mv -f /tmp/* /etc/exports
+  Cmnd_Alias VAGRANT_NFSD_CHECK = /etc/init.d/nfs-kernel-server status
+  Cmnd_Alias VAGRANT_NFSD_START = /etc/init.d/nfs-kernel-server start
+  Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
+  %sudo ALL=(root) NOPASSWD: VAGRANT_EXPORTS_CHOWN, VAGRANT_EXPORTS_MV, VAGRANT_NFSD_CHECK, VAGRANT_NFSD_START, VAGRANT_NFSD_APPLY
+  ```
+  For `Fedora Linux`, `sudoers` might look like this (given your user belongs to the vagrant group):
+  ```
+  Cmnd_Alias VAGRANT_EXPORTS_CHOWN = /bin/chown 0\:0 /tmp/*
+  Cmnd_Alias VAGRANT_EXPORTS_MV = /bin/mv -f /tmp/* /etc/exports
+  Cmnd_Alias VAGRANT_NFSD_CHECK = /usr/bin/systemctl status --no-pager nfs-server.service
+  Cmnd_Alias VAGRANT_NFSD_START = /usr/bin/systemctl start nfs-server.service
+  Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
+  %vagrant ALL=(root) NOPASSWD: VAGRANT_EXPORTS_CHOWN, VAGRANT_EXPORTS_MV, VAGRANT_NFSD_CHECK, VAGRANT_NFSD_START, VAGRANT_NFSD_APPLY
+  ```
+
 Usage
 -----
 

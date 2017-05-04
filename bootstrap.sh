@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ -f /etc/alpine-release ]; then
+  sudo apk update && \
+  sudo apk add python
+fi
 if [ -f /etc/debian_version ]; then
   codename="$(lsb_release -c | awk {'print $2}')"
   if [[ $codename == "vivid" ]]; then
