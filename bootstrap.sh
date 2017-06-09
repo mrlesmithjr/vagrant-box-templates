@@ -1,31 +1,31 @@
 #!/bin/bash
+# Alpine
 if [ -f /etc/alpine-release ]; then
   sudo apk update && \
   sudo apk add python
 fi
+
+# Ubuntu
 if [ -f /etc/debian_version ]; then
-  codename="$(lsb_release -c | awk {'print $2}')"
+  codename="$(lsb_release -c | awk '{print $2}')"
   if [[ $codename == "vivid" ]]; then
-    sudo apt-get update && \
-    sudo apt-get -y install python-simplejson
+    test -e /usr/bin/python || (sudo apt-get update && sudo apt-get -y install python-minimal)
   fi
   if [[ $codename == "wily" ]]; then
-    sudo apt-get update && \
-    sudo apt-get -y install python-simplejson
+    test -e /usr/bin/python || (sudo apt-get update && sudo apt-get -y install python-minimal)
   fi
   if [[ $codename == "xenial" ]]; then
-    sudo apt-get update && \
-    sudo apt-get -y install python-simplejson
+    test -e /usr/bin/python || (sudo apt-get update && sudo apt-get -y install python-minimal)
   fi
   if [[ $codename == "yakkety" ]]; then
-    sudo apt-get update && \
-    sudo apt-get -y install python-simplejson
+    test -e /usr/bin/python || (sudo apt-get update && sudo apt-get -y install python-minimal)
   fi
   if [[ $codename == "zesty" ]]; then
-    sudo apt-get update && \
-    sudo apt-get -y install python-simplejson
+    test -e /usr/bin/python || (sudo apt-get update && sudo apt-get -y install python-minimal)
   fi
 fi
+
+# RHEL
 if [ -f /etc/redhat-release ]; then
   if [ -f /etc/os-release ]; then
     codename="$(gawk -F= '/^NAME/{print $2}' /etc/os-release)"
