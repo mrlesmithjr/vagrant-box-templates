@@ -23,7 +23,7 @@ vagrant plugin install vagrant-alpine
 
     **tl;dr**
 
-    For `OS X`, `sudoers` should have this entry:
+For `OS X`, `sudoers` should have this entry:
 
 ```bash
 Cmnd_Alias VAGRANT_EXPORTS_ADD = /usr/bin/tee -a /etc/exports
