@@ -177,7 +177,7 @@ and cleanup easily by running the following:
 
 ## License
 
-BSD
+MIT
 
 ## Author Information
 
