@@ -1,45 +1,47 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [Vagrant Box Templates](#vagrant-box-templates)
-  - [Purpose](#purpose)
-  - [Requirements](#requirements)
-    - [Software](#software)
-    - [Alpine box requirements](#alpine-box-requirements)
-      - [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
-      - [`/vagrant` synced_folder](#vagrant-synced_folder)
-        - [Setting up `sudoers`](#setting-up-sudoers)
-          - [`OS X`](#os-x)
-          - [`Ubuntu`](#ubuntu)
-          - [`Fedora`](#fedora)
-  - [Useful information](#useful-information)
-    - [Vagrantfile](#vagrantfile)
-    - [File structure](#file-structure)
-    - [Working on different projects](#working-on-different-projects)
-      - [Create development environment](#create-development-environment)
-      - [Create project development environment](#create-project-development-environment)
-      - [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
-  - [Usage](#usage)
-    - [Getting started](#getting-started)
-      - [Clone repo](#clone-repo)
-      - [Choose distro](#choose-distro)
-      - [Customizing environment](#customizing-environment)
-        - [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
-        - [Provisioning](#provisioning)
-      - [Spinning up environment](#spinning-up-environment)
-        - [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
-      - [Tearing down environment](#tearing-down-environment)
-    - [Learning Ansible](#learning-ansible)
-      - [Ansible Groups](#ansible-groups)
-      - [Ansible playbook](#ansible-playbook)
-      - [Ansible `requirements.yml`](#ansible-requirementsyml)
-        - [Installing Ansible roles](#installing-ansible-roles)
-          - [Global Ansible roles installation](#global-ansible-roles-installation)
-          - [Non-Global Ansible roles installation](#non-global-ansible-roles-installation)
-          - [Using existing folder of Ansible roles](#using-existing-folder-of-ansible-roles)
-  - [License](#license)
-  - [Author Information](#author-information)
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+-   [Vagrant Box Templates](#vagrant-box-templates)
+    -   [Purpose](#purpose)
+    -   [Requirements](#requirements)
+        -   [Software](#software)
+        -   [Alpine box requirements](#alpine-box-requirements)
+            -   [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
+            -   [`/vagrant` synced_folder](#vagrant-synced_folder)
+                -   [Setting up `sudoers`](#setting-up-sudoers)
+                    -   [`OS X`](#os-x)
+                    -   [`Ubuntu`](#ubuntu)
+                    -   [`Fedora`](#fedora)
+    -   [Useful information](#useful-information)
+        -   [Vagrantfile](#vagrantfile)
+        -   [File structure](#file-structure)
+        -   [Working on different projects](#working-on-different-projects)
+            -   [Create development environment](#create-development-environment)
+            -   [Create project development environment](#create-project-development-environment)
+            -   [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
+    -   [Usage](#usage)
+        -   [Getting started](#getting-started)
+            -   [Clone repo](#clone-repo)
+            -   [Choose distro](#choose-distro)
+            -   [Customizing environment](#customizing-environment)
+                -   [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
+                -   [Provisioning](#provisioning)
+            -   [Spinning up environment](#spinning-up-environment)
+                -   [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
+            -   [Tearing down environment](#tearing-down-environment)
+        -   [Learning Ansible](#learning-ansible)
+            -   [Ansible Groups](#ansible-groups)
+            -   [Ansible playbook](#ansible-playbook)
+            -   [Ansible `requirements.yml`](#ansible-requirementsyml)
+                -   [Installing Ansible roles](#installing-ansible-roles)
+                    -   [Global Ansible roles installation](#global-ansible-roles-installation)
+                    -   [Non-Global Ansible roles installation](#non-global-ansible-roles-installation)
+                    -   [Using existing folder of Ansible roles](#using-existing-folder-of-ansible-roles)
+    -   [License](#license)
+    -   [Author Information](#author-information)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -76,9 +78,9 @@ vagrant plugin install vagrant-alpine
 > This can be changed to not prompt by references
 > [here](https://www.vagrantup.com/docs/synced-folders/nfs.html)
 
-##### Setting up `sudoers`
+#### Setting up `sudoers`
 
-###### `OS X`
+##### `OS X`
 
 To setup `sudoers` for `OSX` add the following using `visudo`
 
@@ -89,7 +91,7 @@ Cmnd_Alias VAGRANT_EXPORTS_REMOVE = /usr/bin/sed -E -e /*/ d -ibak /etc/exports
 %admin ALL=(root) NOPASSWD: VAGRANT_EXPORTS_ADD, VAGRANT_NFSD, VAGRANT_EXPORTS_REMOVE
 ```
 
-###### `Ubuntu`
+##### `Ubuntu`
 
 To setup `sudoers` for `Ubuntu` add the following using `visudo`
 
@@ -102,7 +104,7 @@ Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
 %sudo ALL=(root) NOPASSWD: VAGRANT_EXPORTS_CHOWN, VAGRANT_EXPORTS_MV, VAGRANT_NFSD_CHECK, VAGRANT_NFSD_START, VAGRANT_NFSD_APPLY
 ```
 
-###### `Fedora`
+##### `Fedora`
 
 To setup `sudoers` for `Fedora` add the following using `visudo`
 
