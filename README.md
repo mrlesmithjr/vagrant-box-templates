@@ -14,6 +14,7 @@
         - [`Ubuntu`](#ubuntu)
         - [`Fedora`](#fedora)
   - [Useful information](#useful-information)
+    - [Building Vagrant Boxes](#building-vagrant-boxes)
     - [Vagrantfile](#vagrantfile)
     - [File structure](#file-structure)
     - [Working on different projects](#working-on-different-projects)
@@ -118,6 +119,12 @@ Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
 ```
 
 ## Useful information
+
+### Building Vagrant Boxes
+
+My process for building and keeping the majority of these boxes up to date is
+by using [Packer](https://www.packer.io). I also maintain a [Packer Templates](https://github.com/mrlesmithjr/packer-templates) repository which
+contains all of the relevant information on how build and test new boxes.
 
 ### Vagrantfile
 
