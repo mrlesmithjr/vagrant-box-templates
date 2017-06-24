@@ -9,9 +9,10 @@
     - [Alpine box requirements](#alpine-box-requirements)
       - [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
       - [`/vagrant` synced_folder](#vagrant-synced_folder)
-        - [`OS X` `sudoers`](#os-x-sudoers)
-        - [`Ubuntu` `sudoers`](#ubuntu-sudoers)
-        - [`Fedora` `sudoers`](#fedora-sudoers)
+        - [Setting up `sudoers`](#setting-up-sudoers)
+          - [`OS X`](#os-x)
+          - [`Ubuntu`](#ubuntu)
+          - [`Fedora`](#fedora)
   - [Useful information](#useful-information)
     - [Vagrantfile](#vagrantfile)
     - [File structure](#file-structure)
@@ -75,7 +76,9 @@ vagrant plugin install vagrant-alpine
 > This can be changed to not prompt by references
 > [here](https://www.vagrantup.com/docs/synced-folders/nfs.html)
 
-##### `OS X` `sudoers`
+##### Setting up `sudoers`
+
+###### `OS X`
 
 To setup `sudoers` for `OSX` add the following using `visudo`
 
@@ -86,7 +89,7 @@ Cmnd_Alias VAGRANT_EXPORTS_REMOVE = /usr/bin/sed -E -e /*/ d -ibak /etc/exports
 %admin ALL=(root) NOPASSWD: VAGRANT_EXPORTS_ADD, VAGRANT_NFSD, VAGRANT_EXPORTS_REMOVE
 ```
 
-##### `Ubuntu` `sudoers`
+###### `Ubuntu`
 
 To setup `sudoers` for `Ubuntu` add the following using `visudo`
 
@@ -99,7 +102,7 @@ Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
 %sudo ALL=(root) NOPASSWD: VAGRANT_EXPORTS_CHOWN, VAGRANT_EXPORTS_MV, VAGRANT_NFSD_CHECK, VAGRANT_NFSD_START, VAGRANT_NFSD_APPLY
 ```
 
-##### `Fedora` `sudoers`
+###### `Fedora`
 
 To setup `sudoers` for `Fedora` add the following using `visudo`
 
