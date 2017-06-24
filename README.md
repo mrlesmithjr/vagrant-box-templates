@@ -366,6 +366,60 @@ in.
 > NOTE: You could definitely add another GIT remote and keep your projects
 > (branches) synced.
 
+Example of what my current environment looks like after cleaning it up a bit
+not long ago.
+
+```bash
+  dev/alpine-docker
+  dev/apache2
+  dev/bird
+  dev/bro-ids
+  dev/cacti
+  dev/ceph
+  dev/config-interfaces
+  dev/dnsmasq
+  dev/docker
+  dev/dumb-init
+  dev/elasticsearch
+  dev/eve-ng
+  dev/fluentd
+  dev/gerrit
+  dev/graylog
+  dev/influxdb
+  dev/k8s
+  dev/kea-dhcp
+  dev/kvm
+  dev/landscape
+  dev/letsencrypt
+  dev/lvm
+  dev/monit
+  dev/motd
+  dev/mysql
+  dev/netdata
+  dev/pdns
+  dev/postgres
+  dev/prometheus-grafana-docker
+  dev/rabbitmq
+  dev/sensu
+  dev/spinnaker
+  dev/squid-haproxy-keepalived
+  dev/stackstorm
+  dev/syslog-ng
+  dev/testing-roles
+  dev/tripwire
+  dev/unbound
+  dev/vault-consul
+  dev/vault-consul-docker
+  dev/vault-consul-docker-monitoring
+  dev/zabbix
+  issue-#9
+* master
+  play/linuxmint
+  play/zesty-desktop
+  test/uname
+  testing/consul
+```
+
 #### Keeping development environment up to date with this repo
 
 In order to keep my development environment synced up with any changes from this
