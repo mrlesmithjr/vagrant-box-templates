@@ -21,6 +21,7 @@
       - [Create development environment](#create-development-environment)
       - [Create project development environment](#create-project-development-environment)
       - [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
+    - [Using Docker containers](#using-docker-containers)
   - [Usage](#usage)
     - [Getting started](#getting-started)
       - [Clone repo](#clone-repo)
@@ -448,6 +449,16 @@ simply have to only do:
 git checkout projectname
 git rebase master
 ```
+
+### Using Docker containers
+
+You may also be interested in using [Docker](https://www.docker.com) containers
+to perform similar testing scenarios as we are doing here. We can still use
+[Vagrant](https://www.vagrantup.com) and [Ansible](https://www.ansible.com) as
+we do here but we replace [Virtualbox](https://www.virtualbox.org) with [Docker](https://www.docker.com) as our provider. This definitely keeps things
+slimmed down a bit but does limit some of our testing scenarios. However, if you
+are interested in this you can also checkout my [vagrant-container-templates](https://github.com/mrlesmithjr/vagrant-container-templates)
+repo for more info on that.
 
 ## Usage
 
