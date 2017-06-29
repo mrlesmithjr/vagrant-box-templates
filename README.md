@@ -32,6 +32,9 @@
       - [Spinning up environment](#spinning-up-environment)
         - [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
       - [Tearing down environment](#tearing-down-environment)
+      - [Unit tests](#unit-tests)
+        - [Executing unit tests](#executing-unit-tests)
+        - [Example unit test results](#example-unit-test-results)
     - [Learning Ansible](#learning-ansible)
       - [Ansible Groups](#ansible-groups)
       - [Ansible playbook](#ansible-playbook)
@@ -613,6 +616,372 @@ you can quickly and cleanly tear it all down:
 
 ```bat
     cleanup.bat
+```
+
+#### Unit tests
+
+If you are interested in using these templates for unit testing I have included
+a beginning [script](./unit-test.sh) which can be used for spinning up a box or
+boxes to conduct unit testing. The current main focus on this is to spin up the
+boxes, provision them based on the roles defined in `playbook.yml`, test
+idempotency and then tear everything down. This script will create a `logs`
+directory which will contain all of the output collected from the unit test. This
+is not perfect at this time but it does work fairly well for basic testing. I
+will be adding more functionality over time and definitely welcome feedback.
+
+##### Executing unit tests
+
+In order to effectively conduct a unit test all you need to do is adjust the
+`nodes.yml` file and define your nodes, ensure `provision: true` is defined,
+define the roles in `playbook.yml` and then:
+
+```bash
+./unit-test.sh
+```
+
+And then let the script do all of the work and record the results.
+
+##### Example unit test results
+
+Below is an example output from a unit test:
+
+```bash
+ansible 2.3.1.0
+  config file = /Users/larry/projects/vagrant/vagrant-box-templates/Ubuntu/xenial64/server/ansible.cfg
+  configured module search path = Default w/o overrides
+  python version = 2.7.13 (default, Apr  4 2017, 08:47:57) [GCC 4.2.1 Compatible Apple LLVM 8.1.0 (clang-802.0.38)]
+ANSIBLE0013 Use shell only when shell functionality is required
+/Users/larry/Git_Projects/GitHub/mrlesmithjr/ansible-base/handlers/main.yml:3
+Task/Handler: update resolvconf
+
+ [WARNING]: Host file not found: /etc/ansible/hosts
+ [WARNING]: provided hosts list is empty, only localhost is available
+
+playbook: playbook.yml
+Bringing machine 'node0' up with 'virtualbox' provider...
+==> node0: Importing base box 'mrlesmithjr/xenial64'...
+
+[KProgress: 10%
+[KProgress: 20%
+[KProgress: 30%
+[KProgress: 40%
+[KProgress: 50%
+[KProgress: 60%
+[KProgress: 70%
+[KProgress: 80%
+[KProgress: 90%
+[K==> node0: Matching MAC address for NAT networking...
+==> node0: Checking if box 'mrlesmithjr/xenial64' is up to date...
+==> node0: Setting the name of the VM: server_node0_1498705353100_6863
+==> node0: Clearing any previously set network interfaces...
+==> node0: Preparing network interfaces based on configuration...
+    node0: Adapter 1: nat
+    node0: Adapter 2: hostonly
+==> node0: Forwarding ports...
+    node0: 22 (guest) => 2222 (host) (adapter 1)
+==> node0: Running 'pre-boot' VM customizations...
+==> node0: Booting VM...
+==> node0: Waiting for machine to boot. This may take a few minutes...
+    node0: SSH address: 127.0.0.1:2222
+    node0: SSH username: vagrant
+    node0: SSH auth method: private key
+    node0:
+    node0: Vagrant insecure key detected. Vagrant will automatically replace
+    node0: this with a newly generated keypair for better security.
+    node0:
+    node0: Inserting generated public key within guest...
+    node0: Removing insecure key from the guest if it's present...
+    node0: Key inserted! Disconnecting and reconnecting using new SSH key...
+==> node0: Machine booted and ready!
+==> node0: Checking for guest additions in VM...
+==> node0: Setting hostname...
+==> node0: Configuring and enabling network interfaces...
+==> node0: Mounting shared folders...
+    node0: /vagrant => /Users/larry/projects/vagrant/vagrant-box-templates/Ubuntu/xenial64/server
+==> node0: Running provisioner: shell...
+    node0: Running: /var/folders/x5/wbmc7zqj1nv4cnjxjqls86sh0000gn/T/vagrant-shell20170628-82789-jpoks9.sh
+==> node0: Hit:1 http://us.archive.ubuntu.com/ubuntu xenial InRelease
+==> node0: Get:2 http://us.archive.ubuntu.com/ubuntu xenial-updates InRelease [102 kB]
+==> node0: Get:3 http://security.ubuntu.com/ubuntu xenial-security InRelease [102 kB]
+==> node0: Get:4 http://us.archive.ubuntu.com/ubuntu xenial-backports InRelease [102 kB]
+==> node0: Get:5 http://us.archive.ubuntu.com/ubuntu xenial-updates/main amd64 Packages [568 kB]
+==> node0: Get:6 http://us.archive.ubuntu.com/ubuntu xenial-updates/main i386 Packages [549 kB]
+==> node0: Get:7 http://security.ubuntu.com/ubuntu xenial-security/main amd64 Packages [294 kB]
+==> node0: Get:8 http://us.archive.ubuntu.com/ubuntu xenial-updates/main Translation-en [230 kB]
+==> node0: Get:9 http://us.archive.ubuntu.com/ubuntu xenial-updates/restricted amd64 Packages [7,772 B]
+==> node0: Get:10 http://us.archive.ubuntu.com/ubuntu xenial-updates/restricted i386 Packages [7,772 B]
+==> node0: Get:11 http://us.archive.ubuntu.com/ubuntu xenial-updates/restricted Translation-en [2,548 B]
+==> node0: Get:12 http://us.archive.ubuntu.com/ubuntu xenial-updates/universe amd64 Packages [490 kB]
+==> node0: Get:13 http://us.archive.ubuntu.com/ubuntu xenial-updates/universe i386 Packages [471 kB]
+==> node0: Get:14 http://security.ubuntu.com/ubuntu xenial-security/main i386 Packages [278 kB]
+==> node0: Get:15 http://us.archive.ubuntu.com/ubuntu xenial-updates/universe Translation-en [194 kB]
+==> node0: Get:16 http://us.archive.ubuntu.com/ubuntu xenial-updates/multiverse amd64 Packages [8,932 B]
+==> node0: Get:17 http://us.archive.ubuntu.com/ubuntu xenial-updates/multiverse i386 Packages [7,992 B]
+==> node0: Get:18 http://us.archive.ubuntu.com/ubuntu xenial-updates/multiverse Translation-en [4,460 B]
+==> node0: Get:19 http://us.archive.ubuntu.com/ubuntu xenial-backports/main amd64 Packages [4,688 B]
+==> node0: Get:20 http://us.archive.ubuntu.com/ubuntu xenial-backports/main i386 Packages [4,692 B]
+==> node0: Get:21 http://us.archive.ubuntu.com/ubuntu xenial-backports/main Translation-en [3,216 B]
+==> node0: Get:22 http://us.archive.ubuntu.com/ubuntu xenial-backports/universe amd64 Packages [5,804 B]
+==> node0: Get:23 http://us.archive.ubuntu.com/ubuntu xenial-backports/universe i386 Packages [5,812 B]
+==> node0: Get:24 http://us.archive.ubuntu.com/ubuntu xenial-backports/universe Translation-en [3,004 B]
+==> node0: Get:25 http://security.ubuntu.com/ubuntu xenial-security/main Translation-en [125 kB]
+==> node0: Get:26 http://security.ubuntu.com/ubuntu xenial-security/restricted amd64 Packages [7,420 B]
+==> node0: Get:27 http://security.ubuntu.com/ubuntu xenial-security/restricted i386 Packages [7,420 B]
+==> node0: Get:28 http://security.ubuntu.com/ubuntu xenial-security/restricted Translation-en [2,428 B]
+==> node0: Get:29 http://security.ubuntu.com/ubuntu xenial-security/universe amd64 Packages [140 kB]
+==> node0: Get:30 http://security.ubuntu.com/ubuntu xenial-security/universe i386 Packages [125 kB]
+==> node0: Get:31 http://security.ubuntu.com/ubuntu xenial-security/universe Translation-en [72.7 kB]
+==> node0: Get:32 http://security.ubuntu.com/ubuntu xenial-security/multiverse amd64 Packages [2,748 B]
+==> node0: Get:33 http://security.ubuntu.com/ubuntu xenial-security/multiverse i386 Packages [2,908 B]
+==> node0: Fetched 3,934 kB in 1s (2,118 kB/s)
+==> node0: Reading package lists...
+==> node0: Reading package lists...
+==> node0: Building dependency tree...
+==> node0: Reading state information...
+==> node0: The following additional packages will be installed:
+==> node0:   libpython-stdlib libpython2.7-minimal libpython2.7-stdlib python python2.7
+==> node0:   python2.7-minimal
+==> node0: Suggested packages:
+==> node0:   python-doc python-tk python2.7-doc binfmt-support
+==> node0: The following NEW packages will be installed:
+==> node0:   libpython-stdlib libpython2.7-minimal libpython2.7-stdlib python
+==> node0:   python-minimal python2.7 python2.7-minimal
+==> node0: 0 upgraded, 7 newly installed, 0 to remove and 93 not upgraded.
+==> node0: Need to get 3,915 kB of archives.
+==> node0: After this operation, 16.6 MB of additional disk space will be used.
+==> node0: Get:1 http://us.archive.ubuntu.com/ubuntu xenial-updates/main amd64 libpython2.7-minimal amd64 2.7.12-1ubuntu0~16.04.1 [339 kB]
+==> node0: Get:2 http://us.archive.ubuntu.com/ubuntu xenial-updates/main amd64 python2.7-minimal amd64 2.7.12-1ubuntu0~16.04.1 [1,295 kB]
+==> node0: Get:3 http://us.archive.ubuntu.com/ubuntu xenial/main amd64 python-minimal amd64 2.7.11-1 [28.2 kB]
+==> node0: Get:4 http://us.archive.ubuntu.com/ubuntu xenial-updates/main amd64 libpython2.7-stdlib amd64 2.7.12-1ubuntu0~16.04.1 [1,884 kB]
+==> node0: Get:5 http://us.archive.ubuntu.com/ubuntu xenial-updates/main amd64 python2.7 amd64 2.7.12-1ubuntu0~16.04.1 [224 kB]
+==> node0: Get:6 http://us.archive.ubuntu.com/ubuntu xenial/main amd64 libpython-stdlib amd64 2.7.11-1 [7,656 B]
+==> node0: Get:7 http://us.archive.ubuntu.com/ubuntu xenial/main amd64 python amd64 2.7.11-1 [137 kB]
+==> node0: dpkg-preconfigure: unable to re-open stdin: No such file or directory
+==> node0: Fetched 3,915 kB in 1s (2,962 kB/s)
+==> node0: Selecting previously unselected package libpython2.7-minimal:amd64.
+==> node0: (Reading database ...
+==> node0: (Reading database ... 5%
+==> node0: (Reading database ... 10%
+==> node0: (Reading database ... 15%
+==> node0: (Reading database ... 20%
+==> node0: (Reading database ... 25%
+==> node0: (Reading database ... 30%
+==> node0: (Reading database ... 35%
+==> node0: (Reading database ... 40%
+==> node0: (Reading database ... 45%
+==> node0: (Reading database ... 50%
+==> node0: (Reading database ... 55%
+==> node0: (Reading database ... 60%
+==> node0: (Reading database ... 65%
+==> node0: (Reading database ... 70%
+==> node0: (Reading database ... 75%
+==> node0: (Reading database ... 80%
+==> node0: (Reading database ... 85%
+==> node0: (Reading database ... 90%
+==> node0: (Reading database ... 95%
+==> node0: (Reading database ... 100%
+==> node0: (Reading database ...
+==> node0: 70600 files and directories currently installed.)
+==> node0: Preparing to unpack .../libpython2.7-minimal_2.7.12-1ubuntu0~16.04.1_amd64.deb ...
+==> node0: Unpacking libpython2.7-minimal:amd64 (2.7.12-1ubuntu0~16.04.1) ...
+==> node0: Selecting previously unselected package python2.7-minimal.
+==> node0: Preparing to unpack .../python2.7-minimal_2.7.12-1ubuntu0~16.04.1_amd64.deb ...
+==> node0: Unpacking python2.7-minimal (2.7.12-1ubuntu0~16.04.1) ...
+==> node0: Selecting previously unselected package python-minimal.
+==> node0: Preparing to unpack .../python-minimal_2.7.11-1_amd64.deb ...
+==> node0: Unpacking python-minimal (2.7.11-1) ...
+==> node0: Selecting previously unselected package libpython2.7-stdlib:amd64.
+==> node0: Preparing to unpack .../libpython2.7-stdlib_2.7.12-1ubuntu0~16.04.1_amd64.deb ...
+==> node0: Unpacking libpython2.7-stdlib:amd64 (2.7.12-1ubuntu0~16.04.1) ...
+==> node0: Selecting previously unselected package python2.7.
+==> node0: Preparing to unpack .../python2.7_2.7.12-1ubuntu0~16.04.1_amd64.deb ...
+==> node0: Unpacking python2.7 (2.7.12-1ubuntu0~16.04.1) ...
+==> node0: Selecting previously unselected package libpython-stdlib:amd64.
+==> node0: Preparing to unpack .../libpython-stdlib_2.7.11-1_amd64.deb ...
+==> node0: Unpacking libpython-stdlib:amd64 (2.7.11-1) ...
+==> node0: Processing triggers for man-db (2.7.5-1) ...
+==> node0: Processing triggers for mime-support (3.59ubuntu1) ...
+==> node0: Setting up libpython2.7-minimal:amd64 (2.7.12-1ubuntu0~16.04.1) ...
+==> node0: Setting up python2.7-minimal (2.7.12-1ubuntu0~16.04.1) ...
+==> node0: Linking and byte-compiling packages for runtime python2.7...
+==> node0: Setting up python-minimal (2.7.11-1) ...
+==> node0: Selecting previously unselected package python.
+==> node0: (Reading database ...
+==> node0: (Reading database ... 5%
+==> node0: (Reading database ... 10%
+==> node0: (Reading database ... 15%
+==> node0: (Reading database ... 20%
+==> node0: (Reading database ... 25%
+==> node0: (Reading database ... 30%
+==> node0: (Reading database ... 35%
+==> node0: (Reading database ... 40%
+==> node0: (Reading database ... 45%
+==> node0: (Reading database ... 50%
+==> node0: (Reading database ... 55%
+==> node0: (Reading database ... 60%
+==> node0: (Reading database ... 65%
+==> node0: (Reading database ... 70%
+==> node0: (Reading database ... 75%
+==> node0: (Reading database ... 80%
+==> node0: (Reading database ... 85%
+==> node0: (Reading database ... 90%
+==> node0: (Reading database ... 95%
+==> node0: (Reading database ... 100%
+==> node0: (Reading database ...
+==> node0: 71347 files and directories currently installed.)
+==> node0: Preparing to unpack .../python_2.7.11-1_amd64.deb ...
+==> node0: Unpacking python (2.7.11-1) ...
+==> node0: Processing triggers for man-db (2.7.5-1) ...
+==> node0: Setting up libpython2.7-stdlib:amd64 (2.7.12-1ubuntu0~16.04.1) ...
+==> node0: Setting up python2.7 (2.7.12-1ubuntu0~16.04.1) ...
+==> node0: Setting up libpython-stdlib:amd64 (2.7.11-1) ...
+==> node0: Setting up python (2.7.11-1) ...
+==> node0: Running provisioner: ansible...
+    node0: Running ansible-playbook...
+
+PLAY [all] *********************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [node0]
+
+TASK [Updating Apt Cache (Debian)] *********************************************
+ok: [node0]
+
+TASK [Installing Ansible Pre-Reqs (Alpine)] ************************************
+skipping: [node0] => (item=[])
+
+TASK [Installing Python Packages (Alpine)] *************************************
+skipping: [node0] => (item=[])
+
+TASK [Installing Python Packages (Alpine)] *************************************
+skipping: [node0] => (item=[])
+
+TASK [Installing Ansible Pre-Reqs (Debian)] ************************************
+changed: [node0] => (item=[u'build-essential', u'libffi-dev', u'libssl-dev', u'python-dev', u'python-pip', u'python-setuptools'])
+
+TASK [Installing EPEL Repo (RedHat)] *******************************************
+skipping: [node0]
+
+TASK [Installing Ansible Pre-Reqs (RedHat)] ************************************
+skipping: [node0] => (item=[])
+
+TASK [Installing Ansible Pre-Reqs (Fedora)] ************************************
+skipping: [node0]
+
+TASK [Installing Ansible Pre-Reqs (Fedora)] ************************************
+skipping: [node0] => (item=[])
+
+TASK [Installing Ansible Pre-Reqs (openSUSE)] **********************************
+skipping: [node0] => (item=[])
+
+TASK [Updating Python Modules] *************************************************
+changed: [node0] => (item=pip)
+changed: [node0] => (item=cffi)
+
+TASK [Installing Ansible] ******************************************************
+changed: [node0]
+
+TASK [Ensuring host_vars Directory Exists] *************************************
+changed: [node0 -> localhost]
+
+TASK [Ensuring Host File Exists In host_vars] **********************************
+ok: [node0 -> localhost]
+
+TASK [Creating Missing host_vars] **********************************************
+changed: [node0 -> localhost]
+
+TASK [Updating ansible_ssh_host] ***********************************************
+skipping: [node0]
+
+TASK [Updating ansible_ssh_host] ***********************************************
+changed: [node0 -> localhost]
+
+TASK [Capturing eth1 IP Address (Alpine)] **************************************
+skipping: [node0]
+
+TASK [Updating ansible_ssh_host (Alpine)] **************************************
+skipping: [node0]
+
+TASK [Updating ansible_ssh_port] ***********************************************
+changed: [node0 -> localhost]
+
+TASK [Updating ansible_ssh_key] ************************************************
+changed: [node0 -> localhost]
+
+TASK [Ensuring host_vars Is YAML Formatted] ************************************
+changed: [node0 -> localhost]
+
+PLAY RECAP *********************************************************************
+node0                      : ok=12   changed=9    unreachable=0    failed=0
+
+==> node0: Running provisioner: ansible...
+    node0: Running ansible-playbook...
+
+PLAY [test-nodes] **************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [node0]
+
+TASK [ansible-base : debian | running apt-get update] **************************
+ok: [node0]
+
+TASK [ansible-base : debian | running apt-get update (forced)] *****************
+skipping: [node0]
+
+TASK [ansible-base : debian | installing base packages] ************************
+changed: [node0] => (item=[u'build-essential', u'software-properties-common', u'curl', u'git', u'git-core', u'ntp', u'scsitools'])
+
+TASK [ansible-base : debian | resetting /etc/dhcp/dhclient.conf to default] ****
+skipping: [node0]
+
+TASK [ansible-base : debian_update_dns_nameservers | setting dns nameservers] ***
+skipping: [node0]
+
+TASK [ansible-base : debian | setting dns search suffix] ***********************
+skipping: [node0]
+
+TASK [ansible-base : redhat | installing base packages] ************************
+skipping: [node0] => (item=[])
+
+TASK [ansible-base : redhat | installing base packages] ************************
+skipping: [node0] => (item=[])
+
+TASK [ansible-dnsmasq : alpine | Installing DNSMasq] ***************************
+skipping: [node0]
+
+TASK [ansible-dnsmasq : debian | Installing DNSMasq] ***************************
+changed: [node0]
+
+TASK [ansible-dnsmasq : redhat | Installing DNSMasq] ***************************
+skipping: [node0]
+
+TASK [ansible-dnsmasq : redhat | Installing DNSMasq] ***************************
+skipping: [node0]
+
+TASK [ansible-dnsmasq : redhat | Ensuring DNSMasq Service is Enabled and Started] ***
+skipping: [node0]
+
+TASK [ansible-dnsmasq : opensuse | Installing DNSMasq] *************************
+skipping: [node0]
+
+TASK [ansible-dnsmasq : opensuse | Ensuring DNSMasq Service Is Enabled and Started] ***
+skipping: [node0]
+
+TASK [ansible-dnsmasq : dnsmasq_config | Configuring DNSMasq] ******************
+changed: [node0]
+
+TASK [ansible-dnsmasq : dnsmasq_config | Ensuring /var/lib/tftpboot Exists] ****
+skipping: [node0]
+
+RUNNING HANDLER [ansible-dnsmasq : restart dnsmasq] ****************************
+changed: [node0]
+
+PLAY RECAP *********************************************************************
+node0                      : ok=6    changed=4    unreachable=0    failed=0
+
+Idempotence test: pass
+==> node0: Forcing shutdown of VM...
+==> node0: Destroying VM and associated drives...
 ```
 
 ### Learning Ansible
