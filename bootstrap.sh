@@ -5,6 +5,12 @@ if [ -f /etc/alpine-release ]; then
   sudo apk add python
 fi
 
+# Arch
+if [ -f /etc/arch-release ]; then
+  sudo pacman -Sy --noconfirm ca-certificates glibc libffi python \
+  python-boto python-pyopenssl python-pip python-setuptools
+fi
+
 # Ubuntu
 if [ -f /etc/debian_version ]; then
   codename="$(lsb_release -c | awk '{print $2}')"
