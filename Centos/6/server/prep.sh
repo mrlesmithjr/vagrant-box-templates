@@ -2,7 +2,7 @@
 
 LINKS=(".gitignore" "ansible.cfg" "scripts" \
   "bootstrap.yml" "cleanup.bat" "playbook.yml" \
-"requirements.yml" "unit-test.sh" "Vagrantfile")
+"requirements.yml" "unit-test.sh" "Vagrantfile" "prep_host_vars.yml")
 TOP_FOLDER_PATH="../../.."
 for i in "${LINKS[@]}"
 do
