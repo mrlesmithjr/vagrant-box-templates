@@ -1,7 +1,7 @@
 ---
 - name: 'node0'
   ansible_groups:
-    - 'test-nodes'
+    - 'test_nodes'
   box: 'mrlesmithjr/trusty64-desktop-unity'
   desktop: true
   # disks:

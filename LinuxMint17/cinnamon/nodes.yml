@@ -1,7 +1,7 @@
 ---
 - name: 'node0'
   ansible_groups:
-    - 'test-nodes'
+    - 'test_nodes'
   box: 'mrlesmithjr/linuxmint17-amd64-cinnamon'
   desktop: true
   # disks:
