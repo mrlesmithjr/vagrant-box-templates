@@ -1,23 +1,25 @@
 ---
 - name: 'node0'
   ansible_groups:
-    - 'test-nodes'
-  box: 'mrlesmithjr/centos-6'
+    - 'test_nodes'
+  box: 'jacqinthebox/windowsserver2016'
   desktop: false
   # disks:
   #   - size: 10
   #     controller: "SATA Controller"
+  #     controller: "SATA Controller"
   #   - size: 10
   #     controller: "SATA Controller"
-  # interfaces:
-  #   - ip: 192.168.250.10
-  #     auto_config: true
-  #     method: 'static'
+  #     controller: "SATA Controller"
+  interfaces:
+    - ip: 192.168.250.10
+      auto_config: true
+      method: 'static'
   #   - ip: 192.168.1.10
   #     auto_config: false
   #     method: 'static'
   #     network_name: 'network-1'
-  mem: 512
+  mem: 2048
   provision: false
   vcpu: 1
   # port_forwards:
@@ -25,4 +27,4 @@
   #     host: 8080
   #   - guest: 443
   #     host: 4433
-  windows: false
+  windows: true
