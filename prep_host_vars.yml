@@ -51,9 +51,11 @@
       run_once: true
       with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
       when: >
-            (item['windows'] is defined and
+            (item['interfaces'] is defined and
+            item['interfaces'][0]['auto_config']) and
+            ((item['windows'] is defined and
             not item['windows']) or
-            item['windows'] is not defined
+            item['windows'] is not defined)
 
     - name: Updating ansible_ssh_port
       lineinfile:
@@ -64,6 +66,8 @@
       run_once: true
       with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
       when: >
+            (item['interfaces'] is defined and
+            item['interfaces'][0]['auto_config']) and
             (item['windows'] is defined and
             item['windows'])
 

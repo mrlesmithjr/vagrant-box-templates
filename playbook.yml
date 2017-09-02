@@ -1,6 +1,5 @@
 ---
-- hosts: test-nodes
-  become: true
+- hosts: test_nodes
   vars:
     - pri_domain_name: 'test.vagrant.local'
   roles:

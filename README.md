@@ -1,50 +1,52 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [Vagrant Box Templates](#vagrant-box-templates)
-  - [Purpose](#purpose)
-  - [Requirements](#requirements)
-    - [Software](#software)
-    - [Alpine box requirements](#alpine-box-requirements)
-      - [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
-      - [`/vagrant` synced_folder](#vagrant-synced_folder)
-      - [Setting up `sudoers`](#setting-up-sudoers)
-        - [`OS X`](#os-x)
-        - [`Ubuntu`](#ubuntu)
-        - [`Fedora`](#fedora)
-  - [Useful information](#useful-information)
-    - [Building Vagrant Boxes](#building-vagrant-boxes)
-    - [Vagrantfile](#vagrantfile)
-    - [File structure](#file-structure)
-    - [Working on different projects](#working-on-different-projects)
-      - [Create development environment](#create-development-environment)
-      - [Create project development environment](#create-project-development-environment)
-      - [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
-    - [Using Docker containers](#using-docker-containers)
-  - [Usage](#usage)
-    - [Getting started](#getting-started)
-      - [Clone repo](#clone-repo)
-      - [Choose distro](#choose-distro)
-      - [Customizing environment](#customizing-environment)
-        - [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
-        - [Provisioning](#provisioning)
-      - [Spinning up environment](#spinning-up-environment)
-        - [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
-      - [Tearing down environment](#tearing-down-environment)
-      - [Unit tests](#unit-tests)
-        - [Executing unit tests](#executing-unit-tests)
-        - [Example unit test results](#example-unit-test-results)
-    - [Learning Ansible](#learning-ansible)
-      - [Ansible Groups](#ansible-groups)
-      - [Ansible playbook](#ansible-playbook)
-      - [Ansible `requirements.yml`](#ansible-requirementsyml)
-        - [Installing Ansible roles](#installing-ansible-roles)
-          - [Global Ansible roles installation](#global-ansible-roles-installation)
-          - [Non-Global Ansible roles installation](#non-global-ansible-roles-installation)
-          - [Using existing folder of Ansible roles](#using-existing-folder-of-ansible-roles)
-  - [License](#license)
-  - [Author Information](#author-information)
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+-   [Vagrant Box Templates](#vagrant-box-templates)
+    -   [Purpose](#purpose)
+    -   [Requirements](#requirements)
+        -   [Software](#software)
+        -   [Alpine box requirements](#alpine-box-requirements)
+            -   [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
+            -   [`/vagrant` synced_folder](#vagrant-synced_folder)
+            -   [Setting up `sudoers`](#setting-up-sudoers)
+                -   [`OS X`](#os-x)
+                -   [`Ubuntu`](#ubuntu)
+                -   [`Fedora`](#fedora)
+    -   [Useful information](#useful-information)
+        -   [Building Vagrant Boxes](#building-vagrant-boxes)
+        -   [Vagrantfile](#vagrantfile)
+        -   [File structure](#file-structure)
+        -   [Working on different projects](#working-on-different-projects)
+            -   [Create development environment](#create-development-environment)
+            -   [Create project development environment](#create-project-development-environment)
+            -   [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
+        -   [Using Docker containers](#using-docker-containers)
+    -   [Usage](#usage)
+        -   [Getting started](#getting-started)
+            -   [Clone repo](#clone-repo)
+            -   [Choose distro](#choose-distro)
+            -   [Customizing environment](#customizing-environment)
+                -   [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
+                -   [Provisioning](#provisioning)
+            -   [Spinning up environment](#spinning-up-environment)
+                -   [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
+            -   [Tearing down environment](#tearing-down-environment)
+            -   [Unit tests](#unit-tests)
+                -   [Executing unit tests](#executing-unit-tests)
+                -   [Example unit test results](#example-unit-test-results)
+        -   [Learning Ansible](#learning-ansible)
+            -   [Ansible Groups](#ansible-groups)
+            -   [Ansible playbook](#ansible-playbook)
+            -   [Ansible `requirements.yml`](#ansible-requirementsyml)
+                -   [Installing Ansible roles](#installing-ansible-roles)
+                    -   [Global Ansible roles installation](#global-ansible-roles-installation)
+                    -   [Non-Global Ansible roles installation](#non-global-ansible-roles-installation)
+                    -   [Using existing folder of Ansible roles](#using-existing-folder-of-ansible-roles)
+    -   [License](#license)
+    -   [Author Information](#author-information)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -494,7 +496,7 @@ uncomment those sections and adjust them as needed.
 ---
 - name: 'node0'
   ansible_groups:
-    - 'test-nodes'
+    - 'test_nodes'
   box: 'mrlesmithjr/xenial64'
   desktop: false
   # disks:
@@ -523,12 +525,15 @@ uncomment those sections and adjust them as needed.
 ##### Provisioning
 
 If you would like to provision the nodes when they startup you will need to
-set `provision: true` in the `nodes.yml`.
+set `provision: true` in the `nodes.yml`. Also if the box that is to be spun up
+is Windows based then set `windows: true` in order for provisioning specific to
+Windows to occur.
 
 ```yaml
+---
 - name: 'node0'
   ansible_groups:
-    - 'test-nodes'
+    - 'test_nodes'
   box: 'mrlesmithjr/xenial64'
   desktop: false
   # disks:
@@ -545,13 +550,14 @@ set `provision: true` in the `nodes.yml`.
   #     method: 'static'
   #     network_name: 'network-1'
   mem: 512
-  provision: true
+  provision: false
   vcpu: 1
   # port_forwards:
   #   - guest: 80
   #     host: 8080
   #   - guest: 443
   #     host: 4433
+  windows: false
 ```
 
 By default the following provisioning will occur:
@@ -609,7 +615,7 @@ you can quickly and cleanly tear it all down:
 `Non-Windows`:
 
 ```bash
-    ./cleanup.sh
+    ./scripts/cleanup.sh
 ```
 
 `Windows`:
@@ -917,7 +923,7 @@ node0                      : ok=12   changed=9    unreachable=0    failed=0
 ==> node0: Running provisioner: ansible...
     node0: Running ansible-playbook...
 
-PLAY [test-nodes] **************************************************************
+PLAY [test_nodes] **************************************************************
 
 TASK [Gathering Facts] *********************************************************
 ok: [node0]
