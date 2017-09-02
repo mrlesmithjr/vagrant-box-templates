@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-LINKS=(".gitignore" "ansible.cfg" "bootstrap.sh" \
-  "bootstrap.yml" "cleanup.bat" "cleanup.sh" "playbook.yml" \
-"requirements.yml" "unit-test.sh" "Vagrantfile")
+LINKS=(".gitignore" "ansible.cfg" "scripts" \
+  "bootstrap.yml" "cleanup.bat" "playbook.yml" \
+"requirements.yml" "unit-test.sh" "Vagrantfile" "prep_host_vars.yml")
 TOP_FOLDER_PATH="../../.."
 for i in "${LINKS[@]}"
 do

@@ -1,7 +1,7 @@
 ---
 - name: 'node0'
   ansible_groups:
-    - 'test-nodes'
+    - 'test_nodes'
   box: 'mrlesmithjr/fedora-22'
   desktop: false
   # disks:
@@ -25,3 +25,4 @@
   #     host: 8080
   #   - guest: 443
   #     host: 4433
+  windows: false
