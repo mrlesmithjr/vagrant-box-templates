@@ -90,6 +90,16 @@ Vagrant.configure(2) do |config|
           end
         end
 
+        # Setup Windows Server
+        unless node_id['windows'].nil?
+          if node_id['windows']
+            vb.gui = true
+            vb.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
+            vb.customize ['modifyvm', :id, '--accelerate3d', 'on']
+            vb.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
+          end
+        end
+
         # Add additional disk(s)
         unless node_id['disks'].nil?
           dnum = 0
@@ -148,9 +158,21 @@ Vagrant.configure(2) do |config|
       # Provisioners
       unless node_id['provision'].nil?
         if node_id['provision']
-          # runs initial shell script
-          config.vm.provision :shell, path: 'bootstrap.sh', keep_color: 'true'
+          unless node_id['windows'].nil?
+            unless node_id['windows']
+              # runs initial shell script
+              config.vm.provision :shell, path: 'scripts/bootstrap.sh', keep_color: 'true'
+            end
+            if node_id['windows']
+              config.vm.provision 'shell', path: 'scripts/ConfigureRemotingForAnsible.ps1'
+            end
+          end
           if node_id == num_nodes
+            node.vm.provision 'ansible' do |ansible|
+              ansible.limit = 'all'
+              # Sets up host_vars
+              ansible.playbook = 'prep_host_vars.yml'
+            end
             node.vm.provision 'ansible' do |ansible|
               ansible.limit = 'all'
               # runs bootstrap Ansible playbook
