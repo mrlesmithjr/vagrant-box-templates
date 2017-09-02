@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-LINKS=(".gitignore" "ansible.cfg" "bootstrap.sh" \
-  "bootstrap.yml" "cleanup.bat" "cleanup.sh" "playbook.yml" \
+LINKS=(".gitignore" "ansible.cfg" "scripts" \
+  "bootstrap.yml" "cleanup.bat" "playbook.yml" \
 "requirements.yml" "unit-test.sh" "Vagrantfile")
 TOP_FOLDER_PATH="../.."
 for i in "${LINKS[@]}"
