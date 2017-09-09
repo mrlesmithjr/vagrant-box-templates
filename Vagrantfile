@@ -159,12 +159,11 @@ Vagrant.configure(2) do |config|
       unless node_id['provision'].nil?
         if node_id['provision']
           unless node_id['windows'].nil?
-            unless node_id['windows']
-              # runs initial shell script
-              config.vm.provision :shell, path: 'scripts/bootstrap.sh', keep_color: 'true'
-            end
+            # runs initial script
             if node_id['windows']
-              config.vm.provision 'shell', path: 'scripts/ConfigureRemotingForAnsible.ps1'
+              node.vm.provision 'shell', path: 'scripts/ConfigureRemotingForAnsible.ps1'
+            else
+              node.vm.provision :shell, path: 'scripts/bootstrap.sh', keep_color: 'true'
             end
           end
           if node_id == num_nodes
