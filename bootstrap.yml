@@ -145,6 +145,7 @@
       with_items:
         - 'pip'
         - 'cffi'
+        - 'pyOpenSSL'
       when: ansible_os_family != "Windows"
 
 # Install Ansible to run Ansible related tasks within guest
