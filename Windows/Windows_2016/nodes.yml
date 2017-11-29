@@ -2,7 +2,7 @@
 - name: 'node0'
   ansible_groups:
     - 'test_nodes'
-  box: 'jacqinthebox/windowsserver2016'
+  box: 'mrlesmithjr/windows-2016'
   desktop: false
   # disks:
   #   - size: 10
