@@ -2,7 +2,7 @@
 - name: 'node0'
   ansible_groups:
     - 'test_nodes'
-  box: 'devopsguys/Windows2012R2Eval'
+  box: 'mrlesmithjr/windows-2012-r2'
   desktop: false
   # disks:
   #   - size: 10
