@@ -82,11 +82,11 @@ Vagrant.configure(2) do |config|
         unless node_id['desktop'].nil?
           if node_id['desktop']
             vb.gui = true
-            vb.customize ['modifyvm', :id, '--graphicscontroller', 'vboxvga']
             vb.customize ['modifyvm', :id, '--accelerate3d', 'on']
+            vb.customize ['modifyvm', :id, '--graphicscontroller', 'vboxvga']
+            vb.customize ['modifyvm', :id, '--hwvirtex', 'on']
             vb.customize ['modifyvm', :id, '--ioapic', 'on']
             vb.customize ['modifyvm', :id, '--vram', '128']
-            vb.customize ['modifyvm', :id, '--hwvirtex', 'on']
           end
         end
 
@@ -97,6 +97,7 @@ Vagrant.configure(2) do |config|
             vb.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
             vb.customize ['modifyvm', :id, '--accelerate3d', 'on']
             vb.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
+            vb.customize ['modifyvm', :id, '--vram', '128']
           end
         end
 
