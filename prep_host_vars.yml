@@ -2,7 +2,7 @@
 - hosts: all
   gather_facts: false
   vars:
-    host_vars_directory: './host_vars'
+    host_vars_directory: ./host_vars
     host_vars_file: "{{ host_vars_directory }}/{{ item['name'] }}.yml"
     ssh_key_path: ".vagrant/machines/{{ item['name'] }}/virtualbox/private_key"
   tasks:
@@ -18,13 +18,13 @@
         path: "{{ host_vars_file }}"
       delegate_to: localhost
       run_once: true
-      register: "host_var"
+      register: host_var
       with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
 
     - name: Creating Missing host_vars
       file:
         path: "{{ host_vars_directory }}/{{ item['item']['name'] }}.yml"
-        state: "touch"
+        state: touch
       delegate_to: localhost
       run_once: true
       with_items: "{{ host_var['results'] }}"

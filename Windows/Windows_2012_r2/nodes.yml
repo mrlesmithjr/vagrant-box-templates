@@ -1,8 +1,8 @@
 ---
-- name: 'node0'
+- name: node0
   ansible_groups:
-    - 'test_nodes'
-  box: 'mrlesmithjr/windows-2012-r2'
+    - test_nodes
+  box: mrlesmithjr/windows-2012-r2
   desktop: false
   # disks:
   #   - size: 10
@@ -11,14 +11,14 @@
   #   - size: 10
   #     controller: "SATA Controller"
   #     controller: "SATA Controller"
-  interfaces:
-    - ip: 192.168.250.10
-      auto_config: true
-      method: 'static'
+  # interfaces:
+  #   - ip: 192.168.250.10
+  #     auto_config: true
+  #     method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 2048
   provision: false
   vcpu: 1

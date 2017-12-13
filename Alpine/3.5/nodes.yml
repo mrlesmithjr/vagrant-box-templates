@@ -1,8 +1,8 @@
 ---
-- name: 'node0'
+- name: node0
   ansible_groups:
-    - 'test_nodes'
-  box: 'maier/alpine-3.5-x86_64'
+    - test_nodes
+  box: maier/alpine-3.5-x86_64
   desktop: false
   # disks:
   #   - size: 10
@@ -12,15 +12,15 @@
   interfaces:
     - ip: 192.168.250.10
       auto_config: true
-      method: 'static'
+      method: static
   #   - ip: 192.168.1.10
   #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
+  #     method: static
+  #     network_name: network-1
   mem: 512
   provision: true
   synced_folder:
-    type: 'nfs'
+    type: nfs
   vcpu: 1
   # port_forwards:
   #   - guest: 80
