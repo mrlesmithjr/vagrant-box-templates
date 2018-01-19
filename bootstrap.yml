@@ -138,15 +138,27 @@
 
 # Upgrading these packages to ensure a successful Ansible install
     - name: Updating Python Modules
-      pip:
-        name: "{{ item }}"
-        state: latest
-      become: true
-      with_items:
-        - pip
-        - cffi
-        - pyOpenSSL
-      when: ansible_os_family != "Windows"
+      block:
+        - name: Update Python Modules
+          pip:
+            name: "{{ item }}"
+            state: latest
+          become: true
+          with_items:
+            - pip
+            - cffi
+            - pyOpenSSL
+          when: ansible_os_family != "Windows"
+
+      rescue:
+        - name: Downloading Pip Installer
+          get_url:
+            url: https://bootstrap.pypa.io/get-pip.py
+            dest: /tmp/get-pip.py
+
+        - name: Installing Python Pip
+          command: python /tmp/get-pip.py
+          become: true
 
 # Install Ansible to run Ansible related tasks within guest
     - name: Installing Ansible
