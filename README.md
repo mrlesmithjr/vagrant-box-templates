@@ -1,52 +1,51 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
-
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
--   [Vagrant Box Templates](#vagrant-box-templates)
-    -   [Purpose](#purpose)
-    -   [Requirements](#requirements)
-        -   [Software](#software)
-        -   [Alpine box requirements](#alpine-box-requirements)
-            -   [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
-            -   [`/vagrant` synced_folder](#vagrant-synced_folder)
-            -   [Setting up `sudoers`](#setting-up-sudoers)
-                -   [`OS X`](#os-x)
-                -   [`Ubuntu`](#ubuntu)
-                -   [`Fedora`](#fedora)
-    -   [Useful information](#useful-information)
-        -   [Building Vagrant Boxes](#building-vagrant-boxes)
-        -   [Vagrantfile](#vagrantfile)
-        -   [File structure](#file-structure)
-        -   [Working on different projects](#working-on-different-projects)
-            -   [Create development environment](#create-development-environment)
-            -   [Create project development environment](#create-project-development-environment)
-            -   [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
-        -   [Using Docker containers](#using-docker-containers)
-    -   [Usage](#usage)
-        -   [Getting started](#getting-started)
-            -   [Clone repo](#clone-repo)
-            -   [Choose distro](#choose-distro)
-            -   [Customizing environment](#customizing-environment)
-                -   [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
-                -   [Provisioning](#provisioning)
-            -   [Spinning up environment](#spinning-up-environment)
-                -   [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
-            -   [Tearing down environment](#tearing-down-environment)
-            -   [Unit tests](#unit-tests)
-                -   [Executing unit tests](#executing-unit-tests)
-                -   [Example unit test results](#example-unit-test-results)
-        -   [Learning Ansible](#learning-ansible)
-            -   [Ansible Groups](#ansible-groups)
-            -   [Ansible playbook](#ansible-playbook)
-            -   [Ansible `requirements.yml`](#ansible-requirementsyml)
-                -   [Installing Ansible roles](#installing-ansible-roles)
-                    -   [Global Ansible roles installation](#global-ansible-roles-installation)
-                    -   [Non-Global Ansible roles installation](#non-global-ansible-roles-installation)
-                    -   [Using existing folder of Ansible roles](#using-existing-folder-of-ansible-roles)
-    -   [License](#license)
-    -   [Author Information](#author-information)
+- [Vagrant Box Templates](#vagrant-box-templates)
+  - [Purpose](#purpose)
+  - [Requirements](#requirements)
+    - [Software](#software)
+    - [Alpine box requirements](#alpine-box-requirements)
+      - [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
+      - [`/vagrant` synced_folder](#vagrant-synced_folder)
+      - [Setting up `sudoers`](#setting-up-sudoers)
+        - [`OS X`](#os-x)
+        - [`Ubuntu`](#ubuntu)
+        - [`Fedora`](#fedora)
+  - [Included Box Distros](#included-box-distros)
+  - [Useful information](#useful-information)
+    - [Building Vagrant Boxes](#building-vagrant-boxes)
+    - [Vagrantfile](#vagrantfile)
+    - [File structure](#file-structure)
+    - [Working on different projects](#working-on-different-projects)
+      - [Create development environment](#create-development-environment)
+      - [Create project development environment](#create-project-development-environment)
+      - [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
+    - [Using Docker containers](#using-docker-containers)
+  - [Usage](#usage)
+    - [Getting started](#getting-started)
+      - [Clone repo](#clone-repo)
+      - [Choose distro](#choose-distro)
+      - [Customizing environment](#customizing-environment)
+        - [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
+        - [Provisioning](#provisioning)
+      - [Spinning up environment](#spinning-up-environment)
+        - [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
+      - [Tearing down environment](#tearing-down-environment)
+      - [Unit tests](#unit-tests)
+        - [Executing unit tests](#executing-unit-tests)
+        - [Example unit test results](#example-unit-test-results)
+    - [Learning Ansible](#learning-ansible)
+      - [Ansible Groups](#ansible-groups)
+      - [Ansible playbook](#ansible-playbook)
+      - [Ansible `requirements.yml`](#ansible-requirementsyml)
+        - [Installing Ansible roles](#installing-ansible-roles)
+          - [Global Ansible roles installation](#global-ansible-roles-installation)
+          - [Non-Global Ansible roles installation](#non-global-ansible-roles-installation)
+          - [Using existing folder of Ansible roles](#using-existing-folder-of-ansible-roles)
+  - [License](#license)
+  - [Author Information](#author-information)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -124,13 +123,32 @@ Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
 %vagrant ALL=(root) NOPASSWD: VAGRANT_EXPORTS_CHOWN, VAGRANT_EXPORTS_MV, VAGRANT_NFSD_CHECK, VAGRANT_NFSD_START, VAGRANT_NFSD_APPLY
 ```
 
+## Included Box Distros
+
+Below are the included distros along with their respective releases that are
+available in this repo.
+
+| Distro      | Releases                                                               |
+| ----------- | ---------------------------------------------------------------------- |
+| `Alpine`    | `3.4`, `3.5`                                                           |
+| `Arch`      | `N/A`                                                                  |
+| `CentOS`    | `6`, `7`                                                               |
+| `Debian`    | `7`, `8`, `9`                                                          |
+| `Fedora`    | `22`, `23`, `24`, `25`, `26`, `27`                                     |
+| `LinuxMint` | `17`, `18`                                                             |
+| `openSUSE`  | `42.1`, `42.3`                                                         |
+| `Ubuntu`    | `12.04`, `14.04`, `15.04`, `15.10`, `16.04`, `16.10`, `17.04`, `17.10` |
+| `VyOS`      | `1.1.8`                                                                |
+| `Windows`   | `7`, `10`, `2008 R2`, `2012 R2`, `2016`                                |
+
 ## Useful information
 
 ### Building Vagrant Boxes
 
 My process for building and keeping the majority of these boxes up to date is
-by using [Packer](https://www.packer.io). I also maintain a [Packer Templates](https://github.com/mrlesmithjr/packer-templates) repository which
-contains all of the relevant information on how build and test new boxes.
+by using [Packer](https://www.packer.io). I also maintain a
+[Packer Templates](https://github.com/mrlesmithjr/packer-templates) repository
+which contains all of the relevant information on how build and test new boxes.
 
 ### Vagrantfile
 
@@ -460,7 +478,8 @@ git rebase master
 You may also be interested in using [Docker](https://www.docker.com) containers
 to perform similar testing scenarios as we are doing here. We can still use
 [Vagrant](https://www.vagrantup.com) and [Ansible](https://www.ansible.com) as
-we do here but we replace [Virtualbox](https://www.virtualbox.org) with [Docker](https://www.docker.com) as our provider. This definitely keeps things
+we do here but we replace [Virtualbox](https://www.virtualbox.org) with
+[Docker](https://www.docker.com) as our provider. This definitely keeps things
 slimmed down a bit but does limit some of our testing scenarios. However, if you
 are interested in this you can also checkout my [vagrant-container-templates](https://github.com/mrlesmithjr/vagrant-container-templates)
 repo for more info on that.
@@ -651,7 +670,7 @@ And then let the script do all of the work and record the results.
 
 Below is an example output from a unit test:
 
-```bash
+```raw
 ansible 2.3.1.0
   config file = /Users/larry/projects/vagrant/vagrant-box-templates/Ubuntu/xenial64/server/ansible.cfg
   configured module search path = Default w/o overrides
@@ -1131,8 +1150,6 @@ MIT
 
 Larry Smith Jr.
 
--   [@mrlesmithjr]
--   <http://everythingshouldbevirtual.com>
--   mrlesmithjr [at] gmail.com
-
-[@mrlesmithjr]: https://www.twitter.com/mrlesmithjr
+-   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+-   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+-   <mailto:mrlesmithjr@gmail.com>
