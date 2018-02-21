@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 set -e
 # set -x
@@ -40,4 +40,4 @@ ansible-playbook -i hosts playbook.yml \
 || (echo 'Idempotence test: fail' && exit 1)) 2>&1 | tee -a $UNIT_TEST_LOGFILE
 
 # Clean up Vagrant environment
-./cleanup.sh 2>&1 | tee -a $UNIT_TEST_LOGFILE
+./scripts/cleanup.sh 2>&1 | tee -a $UNIT_TEST_LOGFILE
