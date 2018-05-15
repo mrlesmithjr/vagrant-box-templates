@@ -18,7 +18,7 @@
   #     method:   static
   #     network_name: network-1
   mem:            512
-  provision:      true
+  provision:      false
   vcpu:           1
   # port_forwards:
   #   - guest:    80
