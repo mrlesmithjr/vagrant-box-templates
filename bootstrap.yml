@@ -169,6 +169,8 @@
           command: python /tmp/get-pip.py
           become: true
 
+      when: install_ansible
+
 # Install Ansible to run Ansible related tasks within guest
     - name: Installing Ansible
       pip:
