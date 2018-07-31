@@ -6,7 +6,7 @@
       - libffi-dev
       - openssl-dev
       - py-setuptools
-    ansible_ver: 2.2.0.0
+    ansible_ver: 2.6.2
     debian_packages:
       - build-essential
       - libffi-dev
@@ -14,6 +14,7 @@
       - python-dev
       - python-pip
       - python-setuptools
+    install_ansible: false
     pri_domain_name: vagrant.local
     redhat_packages:
       - gmp-devel
@@ -84,7 +85,9 @@
         state: present
       become: true
       with_items: "{{ debian_packages }}"
-      when: ansible_os_family == "Debian"
+      when: >
+            install_ansible and
+            ansible_os_family == "Debian"
 
     - name: Installing EPEL Repo (RedHat)
       yum:
@@ -92,6 +95,7 @@
         state: present
       become: true
       when: >
+            install_ansible and
             ansible_os_family == "RedHat" and
             ansible_distribution != "Fedora"
 
@@ -103,6 +107,7 @@
       become: true
       with_items: "{{ redhat_packages }}"
       when: >
+            install_ansible and
             ansible_os_family == "RedHat" and
             ansible_distribution != "Fedora"
 
@@ -113,6 +118,7 @@
         state: present
       become: true
       when: >
+            install_ansible and
             ansible_os_family == "RedHat" and
             ansible_distribution == "Fedora"
 
@@ -124,6 +130,7 @@
       become: true
       with_items: "{{ redhat_packages }}"
       when: >
+            install_ansible and
             ansible_os_family == "RedHat" and
             ansible_distribution == "Fedora"
 
@@ -134,7 +141,9 @@
         state: present
       become: true
       with_items: "{{ suse_packages }}"
-      when: ansible_os_family == "Suse"
+      when:
+          install_ansible and
+          ansible_os_family == "Suse"
 
 # Upgrading these packages to ensure a successful Ansible install
     - name: Updating Python Modules
@@ -167,4 +176,6 @@
         state: present
         version: "{{ ansible_ver }}"
       become: true
-      when: ansible_os_family != "Windows"
+      when: >
+            install_ansible and
+            ansible_os_family != "Windows"
