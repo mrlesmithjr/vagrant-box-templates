@@ -9,7 +9,7 @@
     - name: Ensuring host_vars Directory Exists
       file:
         path: "{{ host_vars_directory }}"
-        state: "directory"
+        state: directory
       delegate_to: localhost
       run_once: true
 
