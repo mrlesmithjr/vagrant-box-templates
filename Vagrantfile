@@ -75,6 +75,10 @@ Vagrant.configure(2) do |config|
       node.vm.box = node_id['box']
       node.vm.hostname = node_id['name']
       node.vm.provider 'virtualbox' do |vb|
+        # Use linked clones - default: true unless defined in nodes.yml
+        # Define linked_clone: true|false in nodes.yml per node
+        vb.linked_clone = node_id['linked_clone']||= true
+
         vb.memory = node_id['mem']
         vb.cpus = node_id['vcpu']
 

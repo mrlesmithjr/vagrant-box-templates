@@ -21,6 +21,7 @@
       auto_config: false
       method: static
       network_name: network-2
+  linked_clone: true
   mem: 512
   provision: false
   vcpu: 1
@@ -52,6 +53,7 @@
       auto_config: false
       method: static
       network_name: network-2
+  linked_clone: true
   mem: 512
   provision: false
   vcpu: 1

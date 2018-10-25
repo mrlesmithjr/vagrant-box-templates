@@ -1,57 +1,54 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
--   [Vagrant Box Templates](#vagrant-box-templates)
-    -   [Purpose](#purpose)
-    -   [Requirements](#requirements)
-        -   [Software](#software)
-        -   [Alpine box requirements](#alpine-box-requirements)
-            -   [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
-            -   [`/vagrant` synced_folder](#vagrant-synced_folder)
-            -   [Setting up `sudoers`](#setting-up-sudoers)
-                -   [`OS X`](#os-x)
-                -   [`Ubuntu`](#ubuntu)
-                -   [`Fedora`](#fedora)
-    -   [Included Box Distros](#included-box-distros)
-    -   [Useful information](#useful-information)
-        -   [Building Vagrant Boxes](#building-vagrant-boxes)
-        -   [Vagrantfile](#vagrantfile)
-        -   [File structure](#file-structure)
-        -   [Working on different projects](#working-on-different-projects)
-            -   [Create development environment](#create-development-environment)
-            -   [Create project development environment](#create-project-development-environment)
-            -   [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
-        -   [Using Docker containers](#using-docker-containers)
-    -   [Usage](#usage)
-        -   [Getting started](#getting-started)
-            -   [Clone repo](#clone-repo)
-            -   [Choose distro](#choose-distro)
-            -   [Customizing environment](#customizing-environment)
-                -   [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
-                -   [Provisioning](#provisioning)
-            -   [Spinning up environment](#spinning-up-environment)
-                -   [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
-            -   [Tearing down environment](#tearing-down-environment)
-            -   [Unit tests](#unit-tests)
-                -   [Executing unit tests](#executing-unit-tests)
-                -   [Example unit test results](#example-unit-test-results)
-        -   [Learning Ansible](#learning-ansible)
-            -   [Ansible Groups](#ansible-groups)
-            -   [Ansible playbook](#ansible-playbook)
-            -   [Ansible `requirements.yml`](#ansible-requirementsyml)
-                -   [Installing Ansible roles](#installing-ansible-roles)
-                    -   [Global Ansible roles installation](#global-ansible-roles-installation)
-                    -   [Non-Global Ansible roles installation](#non-global-ansible-roles-installation)
-                    -   [Using existing folder of Ansible roles](#using-existing-folder-of-ansible-roles)
-    -   [License](#license)
-    -   [Author Information](#author-information)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # Vagrant Box Templates
+
+<!-- TOC -->
+
+- [Vagrant Box Templates](#vagrant-box-templates)
+  - [Purpose](#purpose)
+  - [Requirements](#requirements)
+    - [Software](#software)
+    - [[Alpine](https://alpinelinux.org/) box requirements](#alpinehttpsalpinelinuxorg-box-requirements)
+      - [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
+      - [`/vagrant` synced_folder](#vagrant-synced_folder)
+      - [Setting up `sudoers`](#setting-up-sudoers)
+        - [`OS X`](#os-x)
+        - [`Ubuntu`](#ubuntu)
+        - [`Fedora`](#fedora)
+  - [Included Box Distros](#included-box-distros)
+  - [Useful information](#useful-information)
+    - [Building Vagrant Boxes](#building-vagrant-boxes)
+    - [Vagrantfile](#vagrantfile)
+    - [File structure](#file-structure)
+    - [Working on different projects](#working-on-different-projects)
+      - [Create development environment](#create-development-environment)
+      - [Create project development environment](#create-project-development-environment)
+      - [Keeping development environment up to date with this repo](#keeping-development-environment-up-to-date-with-this-repo)
+    - [Using Docker containers](#using-docker-containers)
+  - [Usage](#usage)
+    - [Getting started](#getting-started)
+      - [Clone repo](#clone-repo)
+      - [Choose distro](#choose-distro)
+      - [Customizing environment](#customizing-environment)
+        - [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
+        - [Provisioning](#provisioning)
+        - [Linked Clones](#linked-clones)
+      - [Spinning up environment](#spinning-up-environment)
+        - [Example `Ubuntu Trusty` environment](#example-ubuntu-trusty-environment)
+      - [Tearing down environment](#tearing-down-environment)
+      - [Unit tests](#unit-tests)
+        - [Executing unit tests](#executing-unit-tests)
+        - [Example unit test results](#example-unit-test-results)
+    - [Learning Ansible](#learning-ansible)
+      - [Ansible Groups](#ansible-groups)
+      - [Ansible playbook](#ansible-playbook)
+      - [Ansible `requirements.yml`](#ansible-requirementsyml)
+        - [Installing Ansible roles](#installing-ansible-roles)
+          - [Global Ansible roles installation](#global-ansible-roles-installation)
+          - [Non-Global Ansible roles installation](#non-global-ansible-roles-installation)
+          - [Using existing folder of Ansible roles](#using-existing-folder-of-ansible-roles)
+  - [License](#license)
+  - [Author Information](#author-information)
+
+<!-- /TOC -->
 
 ## Purpose
 
@@ -63,15 +60,15 @@ also include `Desktop` versions.
 
 ### Software
 
--   [Ansible](https://www.ansible.com)
--   [Vagrant](https://www.vagrantup.com)
--   [Virtualbox](https://www.virtualbox.org)
+- [Ansible](https://www.ansible.com)
+- [Vagrant](https://www.vagrantup.com)
+- [Virtualbox](https://www.virtualbox.org)
 
 ### [Alpine](https://alpinelinux.org/) box requirements
 
 #### `vagrant-alpine` plugin
 
-> NOTE:  **require** the `vagrant-alpine` plugin to be installed
+> NOTE: **require** the `vagrant-alpine` plugin to be installed
 
 ```bash
 vagrant plugin install vagrant-alpine
@@ -243,6 +240,10 @@ Vagrant.configure(2) do |config|
       node.vm.box = node_id['box']
       node.vm.hostname = node_id['name']
       node.vm.provider "virtualbox" do |vb|
+        # Use linked clones - default: true unless defined in nodes.yml
+        # Define linked_clone: true|false in nodes.yml per node
+        vb.linked_clone = node_id['linked_clone']||= true
+
         vb.memory = node_id['mem']
         vb.cpus = node_id['vcpu']
 
@@ -356,7 +357,7 @@ using `GIT` branches for each project.
 
 #### Create development environment
 
-1.  Clone this repo
+1. Clone this repo
 
 ```bash
 cd ~
@@ -365,14 +366,14 @@ cd projects/vagrant
 git clone https://github.com/mrlesmithjr/vagrant-box-templates
 ```
 
-2.  Remove the `origin` remote
+2. Remove the `origin` remote
 
 ```bash
 cd vagrant-box-templates
 git remote remove origin
 ```
 
-3.  Add this repo as the `upstream` remote
+3. Add this repo as the `upstream` remote
 
 ```bash
 git remote add upstream https://github.com/mrlesmithjr/vagrant-box-templates.git
@@ -514,11 +515,10 @@ uncomment those sections and adjust them as needed.
 `Ubuntu/xenial64/server/nodes.yml`:
 
 ```yaml
----
-- name: 'node0'
+- name: "node0"
   ansible_groups:
-    - 'test_nodes'
-  box: 'mrlesmithjr/xenial64'
+    - "test_nodes"
+  box: "mrlesmithjr/xenial64"
   desktop: false
   # disks:
   #   - size: 10
@@ -533,6 +533,7 @@ uncomment those sections and adjust them as needed.
   #     auto_config: false
   #     method: 'static'
   #     network_name: 'network-1'
+  linked_clone: true
   mem: 512
   provision: false
   vcpu: 1
@@ -551,11 +552,10 @@ is Windows based then set `windows: true` in order for provisioning specific to
 Windows to occur.
 
 ```yaml
----
-- name: 'node0'
+- name: "node0"
   ansible_groups:
-    - 'test_nodes'
-  box: 'mrlesmithjr/xenial64'
+    - "test_nodes"
+  box: "mrlesmithjr/xenial64"
   desktop: false
   # disks:
   #   - size: 10
@@ -570,6 +570,7 @@ Windows to occur.
   #     auto_config: false
   #     method: 'static'
   #     network_name: 'network-1'
+  linked_clone: true
   mem: 512
   provision: false
   vcpu: 1
@@ -583,9 +584,9 @@ Windows to occur.
 
 By default the following provisioning will occur:
 
--   [bootstrap.sh](./bootstrap.sh)
--   [bootstrap.yml](./bootstrap.yml)
--   [playbook.yml](./playbook.yml)
+- [bootstrap.sh](./bootstrap.sh)
+- [bootstrap.yml](./bootstrap.yml)
+- [playbook.yml](./playbook.yml)
 
 ```ruby
 # Provisioners
@@ -608,6 +609,44 @@ if not node_id['provision'].nil?
     end
   end
 end
+```
+
+##### Linked Clones
+
+By default, all VMs are configured to be spun up as linked clones. This is the
+default to keep disk space to a minimum. You can easily change a VM to either
+be a linked clone or not by changing or adding the `linked_clone: true` or
+`linked_clone: false` to the `nodes.yml` file in the respective distro folder:
+
+```yaml
+- name: node0
+  ansible_groups:
+    - test_nodes
+  box: mrlesmithjr/bionic64
+  desktop: false
+  # disks:
+  #   - size:     10
+  #     controller: "SATA Controller"
+  #   - size:     10
+  #     controller: "SATA Controller"
+  # interfaces:
+  #   - ip:       192.168.250.10
+  #     auto_config: true
+  #     method:   static
+  #   - ip:       192.168.1.10
+  #     auto_config: false
+  #     method:   static
+  #     network_name: network-1
+  linked_clone: true
+  mem: 512
+  provision: false
+  vcpu: 1
+  # port_forwards:
+  #   - guest:    80
+  #     host:     8080
+  #   - guest:    443
+  #     host:     4433
+  windows: false
 ```
 
 #### Spinning up environment
@@ -1026,11 +1065,10 @@ Swarm Workers. So I would something similar to below:
 `nodes.yml`:
 
 ```yaml
----
-- name: 'node0'
+- name: "node0"
   ansible_groups:
-    - 'swarm_managers'
-  box: 'mrlesmithjr/xenial64'
+    - "swarm_managers"
+  box: "mrlesmithjr/xenial64"
   desktop: false
   # disks:
   #   - size: 10
@@ -1040,11 +1078,12 @@ Swarm Workers. So I would something similar to below:
   interfaces:
     - ip: 192.168.250.10
       auto_config: true
-      method: 'static'
+      method: "static"
   #   - ip: 192.168.1.10
   #     auto_config: false
   #     method: 'static'
   #     network_name: 'network-1'
+  linked_clone: true
   mem: 512
   provision: true
   vcpu: 1
@@ -1053,10 +1092,10 @@ Swarm Workers. So I would something similar to below:
   #     host: 8080
   #   - guest: 443
   #     host: 4433
-- name: 'node1'
+- name: "node1"
   ansible_groups:
-    - 'docker_swarm_workers'
-  box: 'mrlesmithjr/xenial64'
+    - "docker_swarm_workers"
+  box: "mrlesmithjr/xenial64"
   desktop: false
   # disks:
   #   - size: 10
@@ -1066,11 +1105,12 @@ Swarm Workers. So I would something similar to below:
   interfaces:
     - ip: 192.168.250.11
       auto_config: true
-      method: 'static'
+      method: "static"
   #   - ip: 192.168.1.10
   #     auto_config: false
   #     method: 'static'
   #     network_name: 'network-1'
+  linked_clone: true
   mem: 512
   provision: true
   vcpu: 1
@@ -1152,6 +1192,6 @@ MIT
 
 Larry Smith Jr.
 
--   [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
--   [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
--   <mailto:mrlesmithjr@gmail.com>
+- [EverythingShouldBeVirtual](http://everythingshouldbevirtual.com)
+- [@mrlesmithjr](https://www.twitter.com/mrlesmithjr)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)
