@@ -40,6 +40,7 @@
       with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
       when: >
             item['interfaces'] is defined and
+            item['interfaces'] != [] and
             item['interfaces'][0]['auto_config']
 
     - name: Updating ansible_ssh_port
@@ -52,6 +53,7 @@
       with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
       when: >
             (item['interfaces'] is defined and
+            item['interfaces'] != [] and
             item['interfaces'][0]['auto_config']) and
             ((item['windows'] is defined and
             not item['windows']) or
@@ -67,6 +69,7 @@
       with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
       when: >
             (item['interfaces'] is defined and
+            item['interfaces'] != [] and
             item['interfaces'][0]['auto_config']) and
             (item['windows'] is defined and
             item['windows'])
