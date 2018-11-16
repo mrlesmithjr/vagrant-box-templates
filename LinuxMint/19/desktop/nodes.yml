@@ -2,7 +2,7 @@
 - name: node0
   ansible_groups:
   - test_nodes
-  box: mrlesmithjr/linuxmint19-amd64-cinnamon
+  box: mrlesmithjr/linuxmint19-desktop
   desktop: true
   disks: []
   # - size: 10
