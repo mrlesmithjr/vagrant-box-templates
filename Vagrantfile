@@ -97,6 +97,9 @@ Vagrant.configure(2) do |config|
         # Setup Windows Server
         unless node_id['windows'].nil?
           if node_id['windows']
+            node.vm.guest = :windows
+            node.vm.communicator = :winrm
+            vb.default_nic_type = "82540EM"
             vb.gui = true
             vb.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
             vb.customize ['modifyvm', :id, '--accelerate3d', 'on']
