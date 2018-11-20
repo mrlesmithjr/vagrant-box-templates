@@ -1,1 +1,1 @@
-../../cleanup.bat
+../../../cleanup.bat
