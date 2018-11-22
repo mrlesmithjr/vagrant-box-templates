@@ -2,7 +2,7 @@
 - name: node0
   ansible_groups:
   - test_nodes
-  box: mrlesmithjr/openSUSE_42_3
+  box: mrlesmithjr/opensuse423
   desktop: false
   disks: []
   # - size: 10

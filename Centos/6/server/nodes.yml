@@ -2,7 +2,7 @@
 - name: node0
   ansible_groups:
   - test_nodes
-  box: mrlesmithjr/centos-6
+  box: mrlesmithjr/centos6
   desktop: false
   disks: []
   # - size: 10
