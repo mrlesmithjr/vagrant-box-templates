@@ -2,7 +2,7 @@
 - name: node0
   ansible_groups:
   - test_nodes
-  box: mrlesmithjr/archlinux
+  box: mrlesmithjr/arch20181101
   desktop: false
   disks: []
   # - size: 10
