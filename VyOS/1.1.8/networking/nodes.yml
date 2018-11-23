@@ -2,7 +2,7 @@
 - name: node0
   ansible_groups:
   - test_nodes
-  box: mrlesmithjr/vyos-1.1.8
+  box: mrlesmithjr/vyos118
   desktop: false
   disks: []
   # - size: 10
@@ -34,7 +34,7 @@
 - name: node1
   ansible_groups:
   - test_nodes
-  box: mrlesmithjr/vyos-1.1.8
+  box: mrlesmithjr/vyos118
   desktop: false
   disks: []
   # - size: 10
