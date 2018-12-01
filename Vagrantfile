@@ -74,23 +74,23 @@ Vagrant.configure(2) do |config|
       end
       node.vm.box = node_id['box']
       node.vm.hostname = node_id['name']
-      node.vm.provider 'virtualbox' do |vb|
+      node.vm.provider 'virtualbox' do |vbox|
         # Use linked clones - default: true unless defined in nodes.yml
         # Define linked_clone: true|false in nodes.yml per node
-        vb.linked_clone = node_id['linked_clone']||= true
+        vbox.linked_clone = node_id['linked_clone']||= true
 
-        vb.memory = node_id['mem']
-        vb.cpus = node_id['vcpu']
+        vbox.memory = node_id['mem']
+        vbox.cpus = node_id['vcpu']
 
         # Setup desktop environment
         unless node_id['desktop'].nil?
           if node_id['desktop']
-            vb.gui = true
-            vb.customize ['modifyvm', :id, '--accelerate3d', 'on']
-            vb.customize ['modifyvm', :id, '--graphicscontroller', 'vboxvga']
-            vb.customize ['modifyvm', :id, '--hwvirtex', 'on']
-            vb.customize ['modifyvm', :id, '--ioapic', 'on']
-            vb.customize ['modifyvm', :id, '--vram', '128']
+            vbox.gui = true
+            vbox.customize ['modifyvm', :id, '--accelerate3d', 'on']
+            vbox.customize ['modifyvm', :id, '--graphicscontroller', 'vboxvga']
+            vbox.customize ['modifyvm', :id, '--hwvirtex', 'on']
+            vbox.customize ['modifyvm', :id, '--ioapic', 'on']
+            vbox.customize ['modifyvm', :id, '--vram', '128']
           end
         end
 
@@ -99,12 +99,12 @@ Vagrant.configure(2) do |config|
           if node_id['windows']
             node.vm.guest = :windows
             node.vm.communicator = :winrm
-            vb.default_nic_type = "82540EM"
-            vb.gui = true
-            vb.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
-            vb.customize ['modifyvm', :id, '--accelerate3d', 'on']
-            vb.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
-            vb.customize ['modifyvm', :id, '--vram', '128']
+            vbox.default_nic_type = "82540EM"
+            vbox.gui = true
+            vbox.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
+            vbox.customize ['modifyvm', :id, '--accelerate3d', 'on']
+            vbox.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
+            vbox.customize ['modifyvm', :id, '--vram', '128']
           end
         end
 
@@ -115,13 +115,63 @@ Vagrant.configure(2) do |config|
             dnum = (dnum.to_i + 1)
             ddev = "#{node_id['name']}_Disk#{dnum}.vdi"
             dsize = disk_num['size'].to_i * 1024
-            unless File.exist?(ddev.to_s)
-              vb.customize ['createhd', '--filename', ddev.to_s, \
+            unless File.file?(ddev.to_s)
+              vbox.customize ['createhd', '--filename', ddev.to_s, \
                             '--variant', 'Fixed', '--size', dsize]
             end
-            vb.customize ['storageattach', :id, '--storagectl', \
+            vbox.customize ['storageattach', :id, '--storagectl', \
                           (disk_num['controller']).to_s, '--port', dnum, '--device', 0, \
                           '--type', 'hdd', '--medium', ddev.to_s]
+          end
+        end
+      end
+
+      ['vmware_desktop', 'vmware_fusion'].each do |vmware|
+        node.vm.provider vmware do |vmw|
+          # Use linked clones - default: true unless defined in nodes.yml
+          # Define linked_clone: true|false in nodes.yml per node
+          vmw.linked_clone = node_id['linked_clone']||= true
+
+          vmw.vmx['memsize'] = node_id['mem']
+          vmw.vmx['numvcpus'] = node_id['vcpu']
+
+          # Setup desktop environment
+          unless node_id['desktop'].nil?
+            if node_id['desktop']
+              vmw.gui = true
+              vmw.vmx['mks.enable3d'] = true
+            end
+          end
+
+          # Setup Windows Server
+          unless node_id['windows'].nil?
+            if node_id['windows']
+              node.vm.guest = :windows
+              node.vm.communicator = :winrm
+              # vmw.vmx['ethernet0.virtualdev'] = 'e1000'
+              vmw.gui = true
+              vmw.vmx['mks.enable3d'] = true
+            else
+              vmw.vmx['ethernet0.pcislotnumber'] = '33'
+            end
+          end
+
+          # Add additional disk(s)
+          unless node_id['disks'].nil?
+            vdiskmanager = 'vmware-vdiskmanager'
+            dnum = 0
+            vmdk_path = File.dirname(__FILE__)
+            node_id['disks'].each do |disk_num|
+              dnum = (dnum.to_i + 1)
+              ddev = File.join(vmdk_path, "#{node_id['name']}_Disk#{dnum}.vmdk")
+              dsize = "#{disk_num['size']}GB"
+              unless File.file?(ddev)
+                `#{vdiskmanager} -c -s #{dsize} -a lsilogic -t 0 #{ddev}`
+              end
+              vmw.vmx["scsi0:#{dnum}.filename"] = "#{ddev}"
+              vmw.vmx["scsi0:#{dnum}.present"] = true
+              vmw.vmx["scsi0:#{dnum}.redo"] = ''
+            end
           end
         end
       end

@@ -1,8 +1,8 @@
 #!/bin/bash
 vagrant destroy -f
-if [ -d host_vars ]; then
-  rm -rf host_vars
-fi
-if [ -d .vagrant ]; then
-  rm -rf .vagrant
-fi
+find . -type d -name "host_vars"
+find . -type d -name "host_vars" -exec rm -rf {} +
+find . -type d -name ".vagrant"
+find . -type d -name ".vagrant" -exec rm -rf {} +
+find . -type f -name "*.vmdk"
+find . -type f -name "*.vmdk" -exec rm {} +
