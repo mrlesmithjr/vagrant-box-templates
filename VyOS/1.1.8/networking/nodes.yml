@@ -24,6 +24,8 @@
   linked_clone: true
   mem: 512
   provision: false
+  synced_folder:
+    type: nfs
   vcpu: 1
   port_forwards: []
   # - guest: 80
