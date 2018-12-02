@@ -19,7 +19,7 @@
   #   network_name: network-1
   linked_clone: true
   mem: 512
-  provision: true
+  provision: false
   synced_folder:
     type: nfs
   vcpu: 1
