@@ -70,8 +70,16 @@ Vagrant.configure(2) do |config|
       unless node_id['synced_folder'].nil?
         unless node_id['synced_folder']['type'].nil?
           config.vm.synced_folder '.', '/vagrant', type: node_id['synced_folder']['type']
+          config.vm.synced_folder '../../../scripts', '/scripts', type: node_id['synced_folder']['type']
+        else
+          config.vm.synced_folder '.', '/vagrant'
+          config.vm.synced_folder '../../../scripts', '/scripts'
         end
+      else
+        config.vm.synced_folder '.', '/vagrant'
+        config.vm.synced_folder '../../../scripts', '/scripts'
       end
+
       node.vm.box = node_id['box']
       node.vm.hostname = node_id['name']
       node.vm.provider 'virtualbox' do |vbox|
