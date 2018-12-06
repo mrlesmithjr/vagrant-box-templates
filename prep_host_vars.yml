@@ -4,7 +4,6 @@
   vars:
     host_vars_directory: ./host_vars
     host_vars_file: "{{ host_vars_directory }}/{{ item['name'] }}.yml"
-    ssh_key_path: ".vagrant/machines/{{ item['name'] }}/virtualbox/private_key"
   tasks:
     - name: Ensuring host_vars Directory Exists
       file:
@@ -73,15 +72,6 @@
             item['interfaces'][0]['auto_config']) and
             (item['windows'] is defined and
             item['windows'])
-
-    - name: Updating ansible_ssh_key
-      lineinfile:
-        dest: "{{ host_vars_file }}"
-        regexp: "^ansible_ssh_private_key_file{{ ':' }}"
-        line: "ansible_ssh_private_key_file{{ ':' }} {{ ssh_key_path }}"
-      delegate_to: localhost
-      run_once: true
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
 
     - name: Updating ansible_connection
       lineinfile:
