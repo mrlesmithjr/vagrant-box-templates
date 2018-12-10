@@ -10,8 +10,9 @@
 require 'yaml'
 
 # Read yaml node definitions to create
-# **Update nodes.yml to reflect any changes
-nodes = YAML.load_file(File.join(File.dirname(__FILE__), 'nodes.yml'))
+# **Update environment.yml to reflect any changes
+environment = YAML.load_file(File.join(File.dirname(__FILE__), 'environment.yml'))
+nodes = environment['nodes']
 
 # Define global variables
 #
@@ -63,21 +64,17 @@ Vagrant.configure(2) do |config|
 
   # Iterate over nodes
   nodes.each do |node_id|
-    # Below is needed if not using Guest Additions
-    # config.vm.synced_folder ".", "/vagrant", type: "rsync",
-    #   rsync__exclude: "hosts"
     config.vm.define node_id['name'] do |node|
       unless node_id['synced_folder'].nil?
         unless node_id['synced_folder']['type'].nil?
           config.vm.synced_folder '.', '/vagrant', type: node_id['synced_folder']['type']
-          config.vm.synced_folder '../../../scripts', '/scripts', type: node_id['synced_folder']['type']
-        else
-          config.vm.synced_folder '.', '/vagrant'
-          config.vm.synced_folder '../../../scripts', '/scripts'
         end
-      else
-        config.vm.synced_folder '.', '/vagrant'
-        config.vm.synced_folder '../../../scripts', '/scripts'
+      end
+
+      unless environment['synced_folders'].nil?
+        environment['synced_folders'].each do |folder|
+          config.vm.synced_folder folder['src'], folder['mountpoint'], type: folder['type']
+        end
       end
 
       node.vm.box = node_id['box']
@@ -99,6 +96,7 @@ Vagrant.configure(2) do |config|
             vbox.customize ['modifyvm', :id, '--hwvirtex', 'on']
             vbox.customize ['modifyvm', :id, '--ioapic', 'on']
             vbox.customize ['modifyvm', :id, '--vram', '128']
+            vbox.customize ['modifyvm', :id, '--audio', 'none']
           end
         end
 
@@ -229,7 +227,24 @@ Vagrant.configure(2) do |config|
             if node_id['windows']
               node.vm.provision 'shell', path: 'scripts/ConfigureRemotingForAnsible.ps1'
             else
-              node.vm.provision :shell, path: 'scripts/bootstrap.sh', keep_color: 'true'
+              node.vm.provision 'shell', path: 'scripts/bootstrap.sh'
+            end
+          end
+          unless node_id['provisioners'].nil?
+            node_id['provisioners'].each do |provisioner|
+              if provisioner['type'] == 'shell'
+                unless provisioner['inline'].nil?
+                  $script = <<-SCRIPT
+                  #{provisioner['inline']}
+                  SCRIPT
+                  node.vm.provision 'shell', inline: $script, privileged: provisioner['privileged']
+                end
+                unless provisioner['path'].nil?
+                  provisioner['path'].each do |script|
+                    node.vm.provision 'shell', path: script, privileged: script['privileged']
+                  end
+                end
+              end
             end
           end
           if node_id == num_nodes
@@ -243,6 +258,32 @@ Vagrant.configure(2) do |config|
               # runs bootstrap Ansible playbook
               ansible.playbook = 'bootstrap.yml'
             end
+            unless environment['provisioners'].nil?
+              environment['provisioners'].each do |provisioner|
+                if provisioner['type'] == 'shell'
+                  unless provisioner['inline'].nil?
+                    $script = <<-SCRIPT
+                    #{provisioner['inline']}
+                    SCRIPT
+                    node.vm.provision 'shell', inline: $script, privileged: provisioner['privileged']
+                  end
+                  unless provisioner['path'].nil?
+                    provisioner['path'].each do |script|
+                      node.vm.provision 'shell', path: script, privileged: script['privileged']
+                    end
+                  end
+                elsif provisioner['type'] == 'ansible'
+                  provisioner['playbooks'].each do |playbook|
+                    node.vm.provision 'ansible' do |ansible|
+                      ansible.limit = 'all'
+                      ansible.playbook = playbook
+                      ansible.groups = ansible_groups
+                    end
+                  end
+                end
+              end
+            end
+            # We run this last to ensure all previous provisioning has been done
             node.vm.provision 'ansible' do |ansible|
               ansible.limit = 'all'
               # runs Ansible playbook for installing roles/executing tasks
