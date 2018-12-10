@@ -22,11 +22,11 @@ nodes:
   - ip:
     auto_config: false
     method: static
-  provisioners: []
     network_name: network-2
   linked_clone: true
   mem: 512
   provision: false
+  provisioners: []
   synced_folder:
     type: nfs
   vcpu: 1
@@ -61,6 +61,7 @@ nodes:
   linked_clone: true
   mem: 512
   provision: false
+  provisioners: []
   vcpu: 1
   port_forwards: []
   # - guest: 80
