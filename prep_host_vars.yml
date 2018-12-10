@@ -4,6 +4,7 @@
   vars:
     host_vars_directory: ./host_vars
     host_vars_file: "{{ host_vars_directory }}/{{ item['name'] }}.yml"
+    nodes: "{{ (lookup('file','environment.yml')|from_yaml)['nodes'] }}"
   tasks:
     - name: Ensuring host_vars Directory Exists
       file:
@@ -18,7 +19,7 @@
       delegate_to: localhost
       run_once: true
       register: host_var
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      with_items: "{{ nodes }}"
 
     - name: Creating Missing host_vars
       file:
@@ -36,7 +37,7 @@
         line: "ansible_ssh_host{{ ':' }} {{ item['interfaces'][0]['ip'] }}"
       delegate_to: localhost
       run_once: true
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      with_items: "{{ nodes }}"
       when: >
             item['interfaces'] is defined and
             item['interfaces'] != [] and
@@ -49,7 +50,7 @@
         line: "ansible_ssh_port{{ ':' }} 22"
       delegate_to: localhost
       run_once: true
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      with_items: "{{ nodes }}"
       when: >
             (item['interfaces'] is defined and
             item['interfaces'] != [] and
@@ -65,7 +66,7 @@
         line: "ansible_ssh_port{{ ':' }} 5986"
       delegate_to: localhost
       run_once: true
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      with_items: "{{ nodes }}"
       when: >
             (item['interfaces'] is defined and
             item['interfaces'] != [] and
@@ -80,7 +81,7 @@
         line: "ansible_connection{{ ':' }} winrm"
       delegate_to: localhost
       run_once: true
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      with_items: "{{ nodes }}"
       when: >
             (item['windows'] is defined and
             item['windows'])
@@ -92,7 +93,7 @@
         line: "ansible_winrm_server_cert_validation{{ ':' }} ignore"
       delegate_to: localhost
       run_once: true
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      with_items: "{{ nodes }}"
       when: >
             (item['windows'] is defined and
             item['windows'])
@@ -104,7 +105,7 @@
         line: "ansible_user{{ ':' }} vagrant"
       delegate_to: localhost
       run_once: true
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      with_items: "{{ nodes }}"
 
     - name: Updating ansible_password
       lineinfile:
@@ -113,7 +114,7 @@
         line: "ansible_password{{ ':' }} vagrant"
       delegate_to: localhost
       run_once: true
-      with_items: "{{ lookup('file','nodes.yml')|from_yaml }}"
+      with_items: "{{ nodes }}"
       when: >
             (item['windows'] is defined and
             item['windows'])

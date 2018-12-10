@@ -1,0 +1,91 @@
+---
+# Global provisioners
+provisioners: []
+  # - type: shell
+  #   inline: |
+  #       if [ -f /etc/os-release ]; then
+  #           os_name="$(awk -F= '/^NAME/{ print $2 }' /etc/os-release | sed 's/"//g')"
+  #           os_version_id="$(awk -F= '/^VERSION_ID/{ print $2}' /etc/os-release | sed 's/"//g')"
+  #           echo $os_name
+  #           echo $os_version_id
+  #       fi
+  #   privileged: true
+  # - type: shell
+  #   path:
+  #     - scripts/test.sh
+  #   privileged: false
+  # - type: ansible
+  #   playbooks:
+  #     - test.yml
+
+# Synced folders
+synced_folders: []
+  # - type: nfs
+  #   src: scripts/
+  #   mountpoint: /scripts
+  # - type: rsync
+  #   src: scripts/
+  #   mountpoint: /scripts
+
+nodes:
+  - name: node0
+    ansible_groups:
+      - test_nodes
+    box: mrlesmithjr/bionic64
+    desktop: false
+    disks: []
+      # - size: 10
+      #   controller: "SATA Controller"
+      # - size: 10
+      #   controller: "SATA Controller"
+    interfaces:
+      - ip: 192.168.250.10
+        auto_config: true
+        method: static
+      # - ip: 192.168.1.10
+      #   auto_config: false
+      #   method: static
+      #   network_name: network-1
+    linked_clone: true
+    mem: 512
+    provision: true
+    # Node specific provisioners
+    provisioners: []
+      # - type: shell
+      #   inline: |
+      #       if [ -f /etc/os-release ]; then
+      #           os_name="$(awk -F= '/^NAME/{ print $2 }' /etc/os-release | sed 's/"//g')"
+      #           os_version_id="$(awk -F= '/^VERSION_ID/{ print $2}' /etc/os-release | sed 's/"//g')"
+      #           echo $os_name
+      #           echo $os_version_id
+      #       fi
+      #   privileged: true
+      # - type: shell
+      #   path:
+      #   - scripts/test.sh
+      #   privileged: false
+    vcpu: 1
+    port_forwards: []
+      # - guest: 80
+      #   host: 8080
+      # - guest: 443
+      #   host: 4433
+    windows: false
+  # - name: node1
+  #   ansible_groups:
+  #     - test_nodes
+  #   box: mrlesmithjr/centos7
+  #   desktop: false
+  #   disks: []
+  #   interfaces:
+  #     - ip: 192.168.250.11
+  #       auto_config: true
+  #       method: static
+  #   linked_clone: true
+  #   mem: 512
+  #   provision: true
+  #   # Node specific provisioners
+  #   provisioners: []
+  #   vcpu: 1
+  #   port_forwards: []
+  #   windows: false

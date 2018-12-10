@@ -1,12 +1,13 @@
-# Vagrant Box Templates
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-<!-- TOC -->
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
 
 - [Vagrant Box Templates](#vagrant-box-templates)
   - [Purpose](#purpose)
   - [Requirements](#requirements)
     - [Software](#software)
-    - [[Alpine](https://alpinelinux.org/) box requirements](#alpinehttpsalpinelinuxorg-box-requirements)
+    - [Alpine box requirements](#alpine-box-requirements)
       - [`vagrant-alpine` plugin](#vagrant-alpine-plugin)
       - [`/vagrant` synced_folder](#vagrant-synced_folder)
       - [Setting up `sudoers`](#setting-up-sudoers)
@@ -48,7 +49,9 @@
   - [License](#license)
   - [Author Information](#author-information)
 
-<!-- /TOC -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Vagrant Box Templates
 
 ## Purpose
 
@@ -160,187 +163,7 @@ ZFS, GlusterFS, Docker Swarm, Kubernetes, ELK Stack, and so on. Not to say that
 a specific use case may not present itself that would require a change to
 the `Vagrantfile` but those are far in between.
 
-```ruby
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
-
-# Ensure yaml module is loaded
-require 'yaml'
-
-# Read yaml node definitions to create
-# **Update nodes.yml to reflect any changes
-nodes = YAML.load_file(File.join(File.dirname(__FILE__), 'nodes.yml'))
-
-# Define global variables
-#
-
-Vagrant.configure(2) do |config|
-  # Iterate over nodes to get a count
-  # Define as 0 for counting the number of nodes to create from nodes.yml
-  groups = [] # Define array to hold ansible groups
-  num_nodes = 0
-  populated_ansible_groups = Hash.new # Create hash to contain iterated groups
-
-  # Create array of Ansible Groups from iterated nodes
-  nodes.each do |node|
-    num_nodes = node
-    node['ansible_groups'].each do |group|
-      groups.push(group)
-    end
-  end
-
-  # Remove duplicate Ansible Groups
-  groups = groups.uniq
-
-  # Iterate through array of Ansible Groups
-  groups.each do |group|
-    group_nodes = []
-    # Iterate list of nodes
-    nodes.each do |node|
-      node['ansible_groups'].each do |nodegroup|
-        # Check if node is a member of iterated group
-        if nodegroup == group
-          group_nodes.push(node['name'])
-        end
-      end
-      populated_ansible_groups[group] = group_nodes
-    end
-  end
-
-  # Dynamic Ansible Groups iterated from nodes.yml
-  ansible_groups = populated_ansible_groups
-
-  # Define Ansible groups statically for more control
-  # ansible_groups = {
-  #   "spines" => ["node0", "node7"],
-  #   "leafs" => ["node[1:2]", "node[8:9]"],
-  #   "quagga-routers:children" => ["spines", "leafs", "compute-nodes"],
-  #   "compute-nodes" => ["node[3:6]"],
-  #   "docker-swarm:children" => ["docker-swarm-managers", "docker-swarm-workers"],
-  #   "docker-swarm-managers" => ["node[3:4]"],
-  #   "docker-swarm-workers" => ["node[5:6]"]
-  # }
-
-  #Iterate over nodes
-  nodes.each do |node_id|
-    # Below is needed if not using Guest Additions
-    # config.vm.synced_folder ".", "/vagrant", type: "rsync",
-    #   rsync__exclude: "hosts"
-    config.vm.define node_id['name'] do |node|
-      if not node_id['synced_folder'].nil?
-        if not node_id['synced_folder']['type'].nil?
-          config.vm.synced_folder ".", "/vagrant", type: node_id['synced_folder']['type']
-        end
-      end
-      node.vm.box = node_id['box']
-      node.vm.hostname = node_id['name']
-      node.vm.provider "virtualbox" do |vb|
-        # Use linked clones - default: true unless defined in nodes.yml
-        # Define linked_clone: true|false in nodes.yml per node
-        vb.linked_clone = node_id['linked_clone']||= true
-
-        vb.memory = node_id['mem']
-        vb.cpus = node_id['vcpu']
-
-        # Setup desktop environment
-        if not node_id['desktop'].nil?
-          if node_id['desktop']
-            vb.gui = true
-            vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
-            vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
-            vb.customize ["modifyvm", :id, "--ioapic", "on"]
-            vb.customize ["modifyvm", :id, "--vram", "128"]
-            vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
-          end
-        end
-
-        # Add additional disk(s)
-        if not node_id['disks'].nil?
-          dnum = 0
-          node_id['disks'].each do |disk_num|
-            dnum = (dnum.to_i + 1)
-            ddev = ("#{node_id['name']}_Disk#{dnum}.vdi")
-            dsize = disk_num['size'].to_i * 1024
-            unless File.exist?("#{ddev}")
-              vb.customize ['createhd', '--filename', ("#{ddev}"), \
-                '--variant', 'Fixed', '--size', dsize]
-            end
-            vb.customize ['storageattach', :id,  '--storagectl', \
-              "#{disk_num['controller']}", '--port', dnum, '--device', 0, \
-              '--type', 'hdd', '--medium', "#{ddev}"]
-          end
-        end
-      end
-
-      # Provision network interfaces
-      if not node_id['interfaces'].nil?
-        node_id['interfaces'].each do |int|
-          if int['method'] == 'dhcp'
-            if int['network_name'] == "None"
-              node.vm.network :private_network, \
-              type: "dhcp"
-            end
-            if int['network_name'] != "None"
-              node.vm.network :private_network, \
-              virtualbox__intnet: int['network_name'], \
-              type: "dhcp"
-            end
-          end
-          if int['method'] == "static"
-            if int['network_name'] == "None"
-              node.vm.network :private_network, \
-              ip: int['ip'], \
-              auto_config: int['auto_config']
-            end
-            if int['network_name'] != "None"
-              node.vm.network :private_network, \
-              virtualbox__intnet: int['network_name'], \
-              ip: int['ip'], \
-              auto_config: int['auto_config']
-            end
-          end
-        end
-      end
-
-      # Port Forwards
-      if not node_id['port_forwards'].nil?
-        node_id['port_forwards'].each do |pf|
-          node.vm.network :forwarded_port, \
-          guest: pf['guest'], \
-          host: pf['host']
-        end
-      end
-
-      # Provisioners
-      if not node_id['provision'].nil?
-        if node_id['provision']
-          #runs initial shell script
-          config.vm.provision :shell, path: "bootstrap.sh", keep_color: "true"
-          if node_id == num_nodes
-            node.vm.provision "ansible" do |ansible|
-              ansible.limit = "all"
-              #runs bootstrap Ansible playbook
-              ansible.playbook = "bootstrap.yml"
-            end
-            node.vm.provision "ansible" do |ansible|
-              ansible.limit = "all"
-              #runs Ansible playbook for installing roles/executing tasks
-              ansible.playbook = "playbook.yml"
-              ansible.groups = ansible_groups
-            end
-          end
-        end
-      end
-    end
-
-  end
-end
-```
+[Vagrantfile](Vagrantfile)
 
 ### File structure
 
@@ -504,111 +327,95 @@ Find the OS of your choice and spin up a node or more.
 
 #### Customizing environment
 
-Each distro folder contains a `nodes.yml` file which you can change the number
-of nodes to spin up if desired.
+Each distro folder contains a `environment.yml` file which you can change the
+number of nodes to spin up if desired.
+
+For examples of possible settings checkout the following test environment:
+[Test/dummy/server/environment.yml](Test/dummy/server/environment.yml)
 
 ##### Disks, interfaces, and port_forwards
 
 If you would like to change `disks|interfaces|port_forwards` feel free to
 uncomment those sections and adjust them as needed.
 
-`Ubuntu/xenial64/server/nodes.yml`:
-
-```yaml
-- name: "node0"
-  ansible_groups:
-    - "test_nodes"
-  box: "mrlesmithjr/xenial64"
-  desktop: false
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
-  # interfaces:
-  #   - ip: 192.168.250.10
-  #     auto_config: true
-  #     method: 'static'
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
-  linked_clone: true
-  mem: 512
-  provision: false
-  vcpu: 1
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
-```
-
 ##### Provisioning
 
 If you would like to provision the nodes when they startup you will need to
-set `provision: true` in the `nodes.yml`. Also if the box that is to be spun up
-is Windows based then set `windows: true` in order for provisioning specific to
-Windows to occur.
-
-```yaml
-- name: "node0"
-  ansible_groups:
-    - "test_nodes"
-  box: "mrlesmithjr/xenial64"
-  desktop: false
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
-  # interfaces:
-  #   - ip: 192.168.250.10
-  #     auto_config: true
-  #     method: 'static'
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: 'static'
-  #     network_name: 'network-1'
-  linked_clone: true
-  mem: 512
-  provision: false
-  vcpu: 1
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
-  windows: false
-```
+set `provision: true` in the `environment.yml`. Also if the box that is to be
+spun up is Windows based then set `windows: true` in order for provisioning
+specific to Windows to occur.
 
 By default the following provisioning will occur:
 
-- [bootstrap.sh](./bootstrap.sh)
-- [bootstrap.yml](./bootstrap.yml)
+- [bootstrap.sh](bootstrap.sh)
+- [pre_host_vars.yml](prep_host_vars.yml)
+- [bootstrap.yml](bootstrap.yml)
 - [playbook.yml](./playbook.yml)
 
-```ruby
-# Provisioners
-if not node_id['provision'].nil?
-  if node_id['provision']
-    #runs initial shell script
-    config.vm.provision :shell, path: "bootstrap.sh", keep_color: "true"
-    if node_id == num_nodes
-      node.vm.provision "ansible" do |ansible|
-        ansible.limit = "all"
-        #runs bootstrap Ansible playbook
-        ansible.playbook = "bootstrap.yml"
-      end
-      node.vm.provision "ansible" do |ansible|
-        ansible.limit = "all"
-        #runs Ansible playbook for installing roles/executing tasks
-        ansible.playbook = "playbook.yml"
-        ansible.groups = ansible_groups
-      end
-    end
-  end
-end
+You may also define custom provisioners either globally or per node to be
+executed during provisioning.
+
+To define global provisioners, simply edit the `environment.yml` file and use
+the following as an example:
+
+```yaml
+# Global provisioners
+provisioners:
+  - type: shell
+    inline: |
+      if [ -f /etc/os-release ]; then
+          os_name="$(awk -F= '/^NAME/{ print $2 }' /etc/os-release | sed 's/"//g')"
+          os_version_id="$(awk -F= '/^VERSION_ID/{ print $2}' /etc/os-release | sed 's/"//g')"
+          echo $os_name
+          echo $os_version_id
+      fi
+    privileged: true
+  # - type: shell
+  #   path:
+  #     - scripts/test.sh
+  #   privileged: false
+  # - type: ansible
+  #   playbooks:
+  #     - test.yml
+```
+
+When it comes to per node provisioning, currently only scripts are supported.
+Ansible playbook provisioners are easy enough to define which nodes should be
+executed against already.
+
+To define per node provisioners, use the below as an example to use within the
+`environment.yml` file:
+
+```yaml
+nodes:
+  - name: node0
+    ansible_groups:
+      - test_nodes
+    box: mrlesmithjr/bionic64
+    desktop: false
+    disks: []
+    interfaces: []
+    linked_clone: true
+    mem: 512
+    provision: true
+    # Node specific provisioners
+    provisioners:
+      # - type: shell
+      #   inline: |
+      #       if [ -f /etc/os-release ]; then
+      #           os_name="$(awk -F= '/^NAME/{ print $2 }' /etc/os-release | sed 's/"//g')"
+      #           os_version_id="$(awk -F= '/^VERSION_ID/{ print $2}' /etc/os-release | sed 's/"//g')"
+      #           echo $os_name
+      #           echo $os_version_id
+      #       fi
+      #   privileged: true
+      - type: shell
+        path:
+          - scripts/test.sh
+        privileged: false
+    vcpu: 1
+    port_forwards: []
+    windows: false
 ```
 
 ##### Linked Clones
@@ -616,38 +423,7 @@ end
 By default, all VMs are configured to be spun up as linked clones. This is the
 default to keep disk space to a minimum. You can easily change a VM to either
 be a linked clone or not by changing or adding the `linked_clone: true` or
-`linked_clone: false` to the `nodes.yml` file in the respective distro folder:
-
-```yaml
-- name: node0
-  ansible_groups:
-    - test_nodes
-  box: mrlesmithjr/bionic64
-  desktop: false
-  # disks:
-  #   - size:     10
-  #     controller: "SATA Controller"
-  #   - size:     10
-  #     controller: "SATA Controller"
-  # interfaces:
-  #   - ip:       192.168.250.10
-  #     auto_config: true
-  #     method:   static
-  #   - ip:       192.168.1.10
-  #     auto_config: false
-  #     method:   static
-  #     network_name: network-1
-  linked_clone: true
-  mem: 512
-  provision: false
-  vcpu: 1
-  # port_forwards:
-  #   - guest:    80
-  #     host:     8080
-  #   - guest:    443
-  #     host:     4433
-  windows: false
-```
+`linked_clone: false` to the `environment.yml` file in the respective distro folder:
 
 #### Spinning up environment
 
@@ -698,7 +474,7 @@ will be adding more functionality over time and definitely welcome feedback.
 ##### Executing unit tests
 
 In order to effectively conduct a unit test all you need to do is adjust the
-`nodes.yml` file and define your nodes, ensure `provision: true` is defined,
+`environment.yml` file and define your nodes, ensure `provision: true` is defined,
 define the roles in `playbook.yml` and then:
 
 ```bash
@@ -1058,11 +834,11 @@ If you are interested in learning Ansible ensure that
 #### Ansible Groups
 
 If you need to create different Ansible groups for your project all you
-need to do is edit the `nodes.yml`. For example if I am working on a project
+need to do is edit the `environment.yml`. For example if I am working on a project
 for Docker Swarm I might want to separate out my nodes by Swarm Managers and
 Swarm Workers. So I would something similar to below:
 
-`nodes.yml`:
+`environment.yml`:
 
 ```yaml
 - name: "node0"
