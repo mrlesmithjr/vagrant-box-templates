@@ -20,24 +20,24 @@ for i in $(cat nodes.yml| grep 'provision: '| awk '{print $2}'); do
 done
 
 if [ ! -d logs ]; then
-  mkdir logs 2>&1 | tee $UNIT_TEST_LOGFILE
+  mkdir logs 2>&1 | tee "$UNIT_TEST_LOGFILE"
 fi
 
 # Check ansible version
-ansible --version 2>&1 | tee -a $UNIT_TEST_LOGFILE
+ansible --version 2>&1 | tee -a "$UNIT_TEST_LOGFILE"
 
-ansible-lint playbook.yml 2>&1 | tee -a $UNIT_TEST_LOGFILE
+ansible-lint playbook.yml 2>&1 | tee -a "$UNIT_TEST_LOGFILE"
 
 # Basic Ansible syntax check
-ansible-playbook playbook.yml --syntax-check 2>&1 | tee -a $UNIT_TEST_LOGFILE
+ansible-playbook playbook.yml --syntax-check 2>&1 | tee -a "$UNIT_TEST_LOGFILE"
 
 # Spin up environment
-vagrant up 2>&1 | tee -a $UNIT_TEST_LOGFILE
+vagrant up 2>&1 | tee -a "$UNIT_TEST_LOGFILE"
 
 # Execute Ansible playbook again and check for idempotence
 ansible-playbook -i hosts playbook.yml \
 | (grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) \
-|| (echo 'Idempotence test: fail' && exit 1)) 2>&1 | tee -a $UNIT_TEST_LOGFILE
+|| (echo 'Idempotence test: fail' && exit 1)) 2>&1 | tee -a "$UNIT_TEST_LOGFILE"
 
 # Clean up Vagrant environment
-./scripts/cleanup.sh 2>&1 | tee -a $UNIT_TEST_LOGFILE
+./scripts/cleanup.sh 2>&1 | tee -a "$UNIT_TEST_LOGFILE"
