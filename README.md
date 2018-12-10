@@ -347,7 +347,7 @@ specific to Windows to occur.
 
 By default the following provisioning will occur:
 
-- [bootstrap.sh](bootstrap.sh)
+- [scripts/bootstrap.sh](scripts/bootstrap.sh)
 - [pre_host_vars.yml](prep_host_vars.yml)
 - [bootstrap.yml](bootstrap.yml)
 - [playbook.yml](./playbook.yml)
