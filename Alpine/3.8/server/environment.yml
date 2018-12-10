@@ -1,4 +1,6 @@
 ---
+provisioners: []
+nodes:
 - name: node0
   ansible_groups:
   - test_nodes
@@ -20,6 +22,7 @@
   linked_clone: true
   mem: 512
   provision: false
+  provisioners: []
   synced_folder:
     type: nfs
   vcpu: 1

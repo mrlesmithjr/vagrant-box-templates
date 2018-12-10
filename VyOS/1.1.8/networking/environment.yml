@@ -1,4 +1,6 @@
 ---
+provisioners: []
+nodes:
 - name: node0
   ansible_groups:
   - test_nodes
@@ -20,6 +22,7 @@
   - ip:
     auto_config: false
     method: static
+  provisioners: []
     network_name: network-2
   linked_clone: true
   mem: 512
