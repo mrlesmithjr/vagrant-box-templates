@@ -77,6 +77,9 @@ Vagrant.configure(2) do |config|
         end
       end
 
+      config.vm.synced_folder 'playbooks', '/playbooks'
+      config.vm.synced_folder 'scripts', '/scripts'
+
       node.vm.box = node_id['box']
       node.vm.hostname = node_id['name']
       node.vm.provider 'virtualbox' do |vbox|
@@ -244,51 +247,76 @@ Vagrant.configure(2) do |config|
                     node.vm.provision 'shell', path: script, privileged: script['privileged']
                   end
                 end
-              end
-            end
-          end
-          if node_id == num_nodes
-            node.vm.provision 'ansible' do |ansible|
-              ansible.limit = 'all'
-              # Sets up host_vars
-              ansible.playbook = 'prep_host_vars.yml'
-            end
-            node.vm.provision 'ansible' do |ansible|
-              ansible.limit = 'all'
-              # runs bootstrap Ansible playbook
-              ansible.playbook = 'bootstrap.yml'
-            end
-            unless environment['provisioners'].nil?
-              environment['provisioners'].each do |provisioner|
-                if provisioner['type'] == 'shell'
-                  unless provisioner['inline'].nil?
-                    $script = <<-SCRIPT
-                    #{provisioner['inline']}
-                    SCRIPT
-                    node.vm.provision 'shell', inline: $script, privileged: provisioner['privileged']
-                  end
-                  unless provisioner['path'].nil?
-                    provisioner['path'].each do |script|
-                      node.vm.provision 'shell', path: script, privileged: script['privileged']
-                    end
-                  end
-                elsif provisioner['type'] == 'ansible'
-                  provisioner['playbooks'].each do |playbook|
-                    node.vm.provision 'ansible' do |ansible|
-                      ansible.limit = 'all'
-                      ansible.playbook = playbook
-                      ansible.groups = ansible_groups
-                    end
+              elsif provisioner['type'] == 'ansible_local'
+                provisioner['playbooks'].each do |playbook|
+                  node.vm.provision 'ansible_local' do |ansible|
+                    ansible.install_mode = "pip"
+                    ansible.playbook = playbook
                   end
                 end
               end
             end
-            # We run this last to ensure all previous provisioning has been done
-            node.vm.provision 'ansible' do |ansible|
-              ansible.limit = 'all'
-              # runs Ansible playbook for installing roles/executing tasks
-              ansible.playbook = 'playbook.yml'
-              ansible.groups = ansible_groups
+          end
+          unless environment['provisioners'].nil?
+            environment['provisioners'].each do |provisioner|
+              if provisioner['type'] == 'shell'
+                unless provisioner['inline'].nil?
+                  $script = <<-SCRIPT
+                  #{provisioner['inline']}
+                  SCRIPT
+                  node.vm.provision 'shell', inline: $script, privileged: provisioner['privileged']
+                end
+                unless provisioner['path'].nil?
+                  provisioner['path'].each do |script|
+                    node.vm.provision 'shell', path: script, privileged: script['privileged']
+                  end
+                end
+              elsif provisioner['type'] == 'ansible_local'
+                provisioner['playbooks'].each do |playbook|
+                  node.vm.provision 'ansible_local' do |ansible|
+                    ansible.install_mode = "pip"
+                    ansible.playbook = playbook
+                  end
+                end
+              end
+            end
+          end
+          if node_id == num_nodes
+            # We only run Ansible playbooks when our host is not Windows
+            # This does not affect ansible_local provisioners
+            if not Vagrant::Util::Platform.windows?
+              node.vm.provision 'ansible' do |ansible|
+                ansible.limit = 'all'
+                # Sets up host_vars
+                ansible.playbook = 'playbooks/prep_host_vars.yml'
+                ansible.groups = ansible_groups
+              end
+              node.vm.provision 'ansible' do |ansible|
+                ansible.limit = 'all'
+                # runs bootstrap Ansible playbook
+                ansible.playbook = 'playbooks/bootstrap.yml'
+                ansible.groups = ansible_groups
+              end
+              unless environment['provisioners'].nil?
+                environment['provisioners'].each do |provisioner|
+                  if provisioner['type'] == 'ansible'
+                    provisioner['playbooks'].each do |playbook|
+                      node.vm.provision 'ansible' do |ansible|
+                        ansible.limit = 'all'
+                        ansible.playbook = playbook
+                        ansible.groups = ansible_groups
+                      end
+                    end
+                  end
+                end
+              end
+              # We run this last to ensure all previous provisioning has been done
+              node.vm.provision 'ansible' do |ansible|
+                ansible.limit = 'all'
+                # runs Ansible playbook for installing roles/executing tasks
+                ansible.playbook = 'playbooks/playbook.yml'
+                ansible.groups = ansible_groups
+              end
             end
           end
         end

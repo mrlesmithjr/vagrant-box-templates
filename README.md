@@ -379,7 +379,7 @@ provisioners:
   #     - test.yml
 ```
 
-When it comes to per node provisioning, currently only scripts are supported.
+When it comes to per node provisioning, currently only `scripts` and `ansible_local` are supported.
 Ansible playbook provisioners are easy enough to define which nodes should be
 executed against already.
 
@@ -902,10 +902,12 @@ do a `vagrant up`. As you can see there were no changes required in the
 `Vagrantfile` to make this all happen. And you will be able to define your
 playbook as you normally would.
 
-#### Ansible playbook
+#### Ansible playbooks
 
-There is an included `playbook.yml` file in the root folder to use as a
-skeleton playbook.
+Within in the [playbooks](playbooks/) directory there is an included `playbook.yml` file to use as a skeleton playbook. This playbook is always
+executed when provisioning. So, you may want to just modify this playbook to
+suit your needs. However, you may create additional playbooks or leverage
+existing ones by adapting your `environment.yml` within the distro folders.
 
 #### Ansible `requirements.yml`
 
