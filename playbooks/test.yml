@@ -1,0 +1,9 @@
+---
+- hosts: all
+  # connection: local
+  tasks:
+    - name: Updating APT Cache
+      apt:
+        update_cache: true
+      become: true
+      when: ansible_os_family == "Debian"
