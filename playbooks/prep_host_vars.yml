@@ -2,20 +2,21 @@
 - hosts: all
   gather_facts: false
   vars:
-    host_vars_directory: ./host_vars
-    host_vars_file: "{{ host_vars_directory }}/{{ item['name'] }}.yml"
-    nodes: "{{ (lookup('file','environment.yml')|from_yaml)['nodes'] }}"
+    host_vars_dir: "{{ working_dir + '/' + vagrant_dir + '/host_vars' }}"
+    nodes: "{{ (lookup('file', working_dir + '/environment.yml')|from_yaml)['nodes'] }}"
+    vagrant_dir: .vagrant/provisioners/ansible/inventory
+    working_dir: "{{ lookup('env', 'PWD') }}"
   tasks:
     - name: Ensuring host_vars Directory Exists
       file:
-        path: "{{ host_vars_directory }}"
+        path: "{{ host_vars_dir }}"
         state: directory
       delegate_to: localhost
       run_once: true
 
     - name: Ensuring Host File Exists In host_vars
       stat:
-        path: "{{ host_vars_file }}"
+        path: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
       delegate_to: localhost
       run_once: true
       register: host_var
@@ -23,7 +24,7 @@
 
     - name: Creating Missing host_vars
       file:
-        path: "{{ host_vars_directory }}/{{ item['item']['name'] }}.yml"
+        path: "{{ host_vars_dir }}/{{ item['item']['name'] }}.yml"
         state: touch
       delegate_to: localhost
       run_once: true
@@ -32,7 +33,7 @@
 
     - name: Updating ansible_ssh_host
       lineinfile:
-        dest: "{{ host_vars_file }}"
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_ssh_host{{ ':' }}"
         line: "ansible_ssh_host{{ ':' }} {{ item['interfaces'][0]['ip'] }}"
       delegate_to: localhost
@@ -45,7 +46,7 @@
 
     - name: Updating ansible_ssh_port
       lineinfile:
-        dest: "{{ host_vars_file }}"
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_ssh_port{{ ':' }}"
         line: "ansible_ssh_port{{ ':' }} 22"
       delegate_to: localhost
@@ -61,7 +62,7 @@
 
     - name: Updating ansible_ssh_port
       lineinfile:
-        dest: "{{ host_vars_file }}"
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_ssh_port{{ ':' }}"
         line: "ansible_ssh_port{{ ':' }} 5986"
       delegate_to: localhost
@@ -76,7 +77,7 @@
 
     - name: Updating ansible_connection
       lineinfile:
-        dest: "{{ host_vars_file }}"
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_connection{{ ':' }}"
         line: "ansible_connection{{ ':' }} winrm"
       delegate_to: localhost
@@ -88,7 +89,7 @@
 
     - name: Updating ansible_winrm_server_cert_validation
       lineinfile:
-        dest: "{{ host_vars_file }}"
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_winrm_server_cert_validation{{ ':' }}"
         line: "ansible_winrm_server_cert_validation{{ ':' }} ignore"
       delegate_to: localhost
@@ -100,7 +101,7 @@
 
     - name: Updating ansible_user
       lineinfile:
-        dest: "{{ host_vars_file }}"
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_user{{ ':' }}"
         line: "ansible_user{{ ':' }} vagrant"
       delegate_to: localhost
@@ -109,7 +110,7 @@
 
     - name: Updating ansible_password
       lineinfile:
-        dest: "{{ host_vars_file }}"
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_password{{ ':' }}"
         line: "ansible_password{{ ':' }} vagrant"
       delegate_to: localhost
