@@ -2,11 +2,19 @@
 - hosts: all
   gather_facts: false
   vars:
+    group_vars_dir: "{{ working_dir + '/' + vagrant_dir + '/group_vars' }}"
     host_vars_dir: "{{ working_dir + '/' + vagrant_dir + '/host_vars' }}"
     nodes: "{{ (lookup('file', working_dir + '/environment.yml')|from_yaml)['nodes'] }}"
     vagrant_dir: .vagrant/provisioners/ansible/inventory
     working_dir: "{{ lookup('env', 'PWD') }}"
   tasks:
+    - name: Ensuring group_vars Directory Exists
+      file:
+        path: "{{ group_vars_dir }}"
+        state: directory
+      delegate_to: localhost
+      run_once: true
+
     - name: Ensuring host_vars Directory Exists
       file:
         path: "{{ host_vars_dir }}"

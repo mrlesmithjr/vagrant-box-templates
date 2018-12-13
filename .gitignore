@@ -1,4 +1,8 @@
-*.retry
 .vagrant/
-logs/
+.vscode/
+*.retry
 *.vmdk
+group_vars/
+host_vars/
+logs/
+venv/
