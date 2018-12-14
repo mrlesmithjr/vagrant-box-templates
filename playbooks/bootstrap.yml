@@ -80,10 +80,9 @@
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (Debian)
       apt:
-        name: "{{ item }}"
+        name: "{{ debian_packages }}"
         state: present
       become: true
-      with_items: "{{ debian_packages }}"
       when: >
             install_ansible and
             ansible_os_family == "Debian"
@@ -101,10 +100,9 @@
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (RedHat)
       yum:
-        name: "{{ item }}"
+        name: "{{ redhat_packages }}"
         state: present
       become: true
-      with_items: "{{ redhat_packages }}"
       when: >
             install_ansible and
             ansible_os_family == "RedHat" and
@@ -124,10 +122,9 @@
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (Fedora)
       dnf:
-        name: "{{ item }}"
+        name: "{{ redhat_packages }}"
         state: present
       become: true
-      with_items: "{{ redhat_packages }}"
       when: >
             install_ansible and
             ansible_os_family == "RedHat" and
@@ -136,10 +133,9 @@
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (openSUSE)
       zypper:
-        name: "{{ item }}"
+        name: "{{ suse_packages }}"
         state: present
       become: true
-      with_items: "{{ suse_packages }}"
       when: >
           install_ansible and
           ansible_os_family == "Suse"
