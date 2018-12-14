@@ -1,16 +1,16 @@
 ---
-# Global provisioners
-# Will run against every node
-# For node specific provisioners add at the node level
+# License: MIT
+
+# Author Information
+# Larry Smith Jr.
+# http://everythingshouldbevirtual.com
+# https://www.twitter.com/mrlesmithjr
+# mrlesmithjr@gmail.com
+
+# To view available options and settings reference the environment.yml in
+# Test/dummy/server/environment.yml
 provisioners: []
-
-
-# Synced folders
-# Additional synced folders. By default scripts and playbooks are synced
 synced_folders: []
-
-
-# Define nodes
 nodes:
   - name: node0
     ansible_groups:
@@ -31,4 +31,3 @@ nodes:
     vcpu: 1
     port_forwards: []
     windows: false
-

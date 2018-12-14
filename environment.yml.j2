@@ -1,22 +1,27 @@
 ---
-# Global provisioners
-# Will run against every node
-# For node specific provisioners add at the node level
+# License: MIT
+
+# Author Information
+# Larry Smith Jr.
+# http://everythingshouldbevirtual.com
+# https://www.twitter.com/mrlesmithjr
+# mrlesmithjr@gmail.com
+
+# To view available options and settings reference the environment.yml in
+# Test/dummy/server/environment.yml
+
 {%- if environment['provisioners'] != [] %}
 provisioners: {{ environment['provisioners'] }}
 {% else %}
 provisioners: []
-{% endif %}
+{%- endif %}
 
-# Synced folders
-# Additional synced folders. By default scripts and playbooks are synced
 {%- if environment['synced_folders'] != [] and environment['synced_folders'] is not none %}
 synced_folders: {{ environment['synced_folders'] }}
 {% else %}
 synced_folders: []
-{% endif %}
+{%- endif %}
 
-# Define nodes
 {%- if environment['nodes'] != [] %}
 nodes:
 {%-   for node in environment['nodes'] %}
@@ -56,7 +61,7 @@ nodes:
     vcpu: {{ node['vcpu'] }}
     port_forwards: {{ node['port_forwards'] }}
     windows: {{ node['windows']|lower }}
-{%   endfor %}
+{%   endfor -%}
 {% else %}
 nodes: []
 {% endif %}

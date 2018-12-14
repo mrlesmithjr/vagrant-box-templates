@@ -1,6 +1,7 @@
 ---
-# Global provisioners
-# Will run against every node
+# Global provisioners will run against every node in the order specified.
+# These provisioners run after all node specific provisioners if defined.
+#
 # For node specific provisioners add at the node level
 provisioners: []
   # - type: shell
@@ -24,7 +25,10 @@ provisioners: []
   #     - playbooks/test.yml
 
 # Synced folders
-# Additional synced folders. By default scripts and playbooks are synced
+# Additional synced folders.
+# By default scripts and playbooks are synced, and available in each node as:
+# /playbooks, /scripts, /vagrant/playbooks, and /vagrant/scripts. They are
+# duplicated because of the symlinks within /vagrant. This is as designed.
 synced_folders: []
   # - type: nfs
   #   src: example1/
@@ -33,6 +37,7 @@ synced_folders: []
   #   src: example2/
   #   mountpoint: /example2
 
+# Define nodes which are required for the environment you intend on creating.
 nodes:
   - name: node0
     ansible_groups:
