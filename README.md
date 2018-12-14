@@ -1,8 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
-
 - [Vagrant Box Templates](#vagrant-box-templates)
   - [Purpose](#purpose)
   - [Requirements](#requirements)
@@ -40,7 +38,7 @@
         - [Example unit test results](#example-unit-test-results)
     - [Learning Ansible](#learning-ansible)
       - [Ansible Groups](#ansible-groups)
-      - [Ansible playbook](#ansible-playbook)
+      - [Ansible playbooks](#ansible-playbooks)
       - [Ansible `requirements.yml`](#ansible-requirementsyml)
         - [Installing Ansible roles](#installing-ansible-roles)
           - [Global Ansible roles installation](#global-ansible-roles-installation)
@@ -126,6 +124,8 @@ Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
 ```
 
 ## Included Box Distros
+
+> NOTE: This list may not be completely up to date.
 
 Below are the included distros along with their respective releases that are
 available in this repo.
@@ -348,9 +348,9 @@ specific to Windows to occur.
 By default the following provisioning will occur:
 
 - [scripts/bootstrap.sh](scripts/bootstrap.sh)
-- [pre_host_vars.yml](prep_host_vars.yml)
-- [bootstrap.yml](bootstrap.yml)
-- [playbook.yml](./playbook.yml)
+- [pre_host_vars.yml](playbooks/prep_host_vars.yml)
+- [bootstrap.yml](playbooks/bootstrap.yml)
+- [playbook.yml](playbooks/playbook.yml)
 
 You may also define custom provisioners either globally or per node to be
 executed during provisioning.
