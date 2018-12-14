@@ -1,0 +1,62 @@
+---
+# Global provisioners
+# Will run against every node
+# For node specific provisioners add at the node level
+{%- if environment['provisioners'] != [] %}
+provisioners: {{ environment['provisioners'] }}
+{% else %}
+provisioners: []
+{% endif %}
+
+# Synced folders
+# Additional synced folders. By default scripts and playbooks are synced
+{%- if environment['synced_folders'] != [] and environment['synced_folders'] is not none %}
+synced_folders: {{ environment['synced_folders'] }}
+{% else %}
+synced_folders: []
+{% endif %}
+
+# Define nodes
+{%- if environment['nodes'] != [] %}
+nodes:
+{%-   for node in environment['nodes'] %}
+  - name: {{ node['name'] }}
+{%-     if node['ansible_groups'] != [] %}
+    ansible_groups:
+{%-       for group in node['ansible_groups'] %}
+      - {{ group }}
+{%-       endfor -%}
+{%      else %}
+    ansible_groups: []
+{%      endif %}
+    box: {{ node['box'] }}
+    desktop: {{ node['desktop']|lower }}
+    disks: {{ node['disks'] }}
+{%-     if node['interfaces'] != [] %}
+    interfaces:
+{%-       for interface in node['interfaces'] %}
+      - ip: {{ interface['ip'] }}
+        auto_config: {{ interface['auto_config']|lower }}
+        method: {{ interface['method'] }}
+{%-         if interface['network_name'] is defined %}
+        network_name: {{ interface['network_name'] }}
+{%-         endif %}
+{%-       endfor -%}
+{%      else %}
+    interfaces: []
+{%-     endif %}
+    linked_clone: {{ node['linked_clone']|lower }}
+    mem: {{ node['mem'] }}
+    provision: {{ node['provision']|lower }}
+    provisioners: {{ node['provisioners'] }}
+{%-      if node['synced_folder'] is not none %}
+    synced_folder:
+      type: {{ node['synced_folder']['type'] }}
+{%-      endif %}
+    vcpu: {{ node['vcpu'] }}
+    port_forwards: {{ node['port_forwards'] }}
+    windows: {{ node['windows']|lower }}
+{%   endfor %}
+{% else %}
+nodes: []
+{% endif %}
