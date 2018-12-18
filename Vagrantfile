@@ -19,7 +19,7 @@ nodes = environment['nodes']
 
 Vagrant.configure(2) do |config|
   # Iterate over nodes to get a count
-  # Define as 0 for counting the number of nodes to create from nodes.yml
+  # Define as 0 for counting the number of nodes to create from environment.yml
   groups = [] # Define array to hold ansible groups
   num_nodes = 0
   populated_ansible_groups = {} # Create hash to contain iterated groups
@@ -48,7 +48,7 @@ Vagrant.configure(2) do |config|
     end
   end
 
-  # Dynamic Ansible Groups iterated from nodes.yml
+  # Dynamic Ansible Groups iterated from environment.yml
   ansible_groups = populated_ansible_groups
 
   # Define Ansible groups statically for more control
@@ -83,8 +83,8 @@ Vagrant.configure(2) do |config|
       node.vm.box = node_id['box']
       node.vm.hostname = node_id['name']
       node.vm.provider 'virtualbox' do |vbox|
-        # Use linked clones - default: true unless defined in nodes.yml
-        # Define linked_clone: true|false in nodes.yml per node
+        # Use linked clones - default: true unless defined in environment.yml
+        # Define linked_clone: true|false in environment.yml per node
         vbox.linked_clone = node_id['linked_clone']||= true
 
         vbox.memory = node_id['mem']
@@ -137,8 +137,8 @@ Vagrant.configure(2) do |config|
 
       ['vmware_desktop', 'vmware_fusion'].each do |vmware|
         node.vm.provider vmware do |vmw|
-          # Use linked clones - default: true unless defined in nodes.yml
-          # Define linked_clone: true|false in nodes.yml per node
+          # Use linked clones - default: true unless defined in environment.yml
+          # Define linked_clone: true|false in environment.yml per node
           vmw.linked_clone = node_id['linked_clone']||= true
 
           vmw.vmx['memsize'] = node_id['mem']
