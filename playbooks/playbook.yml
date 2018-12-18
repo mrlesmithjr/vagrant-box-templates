@@ -1,6 +1,6 @@
 ---
-- hosts: test_nodes
+- hosts: all
   vars:
     pri_domain_name: test.vagrant.local
-  roles:
-  tasks:
+  roles: []
+  tasks: []
