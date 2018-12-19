@@ -16,7 +16,7 @@ fi
 
 # Check provisioning settings and fail if not set to provision
 for i in $(cat environment.yml|grep 'provision:'| awk -F'provision: ' '{ print $2 }'); do
-  if [ "$i" != "true" ] || [ "$i" != "True" ]; then
+  if [ "$i" != "true" ]; then
     printf "You must set ${red}'provision: true' ${reset}in environment.yml\n"
     printf "in order to do execute a proper unit test."
     exit
