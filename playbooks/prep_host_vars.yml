@@ -43,7 +43,21 @@
       lineinfile:
         dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_ssh_host{{ ':' }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+            (item['interfaces'] is defined and
+            item['interfaces'] == []) or
+            item['interfaces'] is not defined
+
+    - name: Updating ansible_ssh_host
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_ssh_host{{ ':' }}"
         line: "ansible_ssh_host{{ ':' }} {{ item['interfaces'][0]['ip'] }}"
+        state: present
       delegate_to: localhost
       run_once: true
       with_items: "{{ nodes }}"
@@ -56,7 +70,21 @@
       lineinfile:
         dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_ssh_port{{ ':' }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+            (item['interfaces'] is defined and
+            item['interfaces'] == []) or
+            item['interfaces'] is not defined
+
+    - name: Updating ansible_ssh_port
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_ssh_port{{ ':' }}"
         line: "ansible_ssh_port{{ ':' }} 22"
+        state: present
       delegate_to: localhost
       run_once: true
       with_items: "{{ nodes }}"
@@ -73,6 +101,7 @@
         dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_ssh_port{{ ':' }}"
         line: "ansible_ssh_port{{ ':' }} 5986"
+        state: present
       delegate_to: localhost
       run_once: true
       with_items: "{{ nodes }}"
@@ -87,7 +116,21 @@
       lineinfile:
         dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_connection{{ ':' }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+            (item['windows'] is defined and
+            not item['windows']) or
+            item['windows'] is not defined
+
+    - name: Updating ansible_connection
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_connection{{ ':' }}"
         line: "ansible_connection{{ ':' }} winrm"
+        state: present
       delegate_to: localhost
       run_once: true
       with_items: "{{ nodes }}"
@@ -99,7 +142,21 @@
       lineinfile:
         dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_winrm_server_cert_validation{{ ':' }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+            (item['windows'] is defined and
+            not item['windows']) or
+            item['windows'] is not defined
+
+    - name: Updating ansible_winrm_server_cert_validation
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_winrm_server_cert_validation{{ ':' }}"
         line: "ansible_winrm_server_cert_validation{{ ':' }} ignore"
+        state: present
       delegate_to: localhost
       run_once: true
       with_items: "{{ nodes }}"
@@ -112,6 +169,7 @@
         dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_user{{ ':' }}"
         line: "ansible_user{{ ':' }} vagrant"
+        state: present
       delegate_to: localhost
       run_once: true
       with_items: "{{ nodes }}"
@@ -121,6 +179,7 @@
         dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_password{{ ':' }}"
         line: "ansible_password{{ ':' }} vagrant"
+        state: present
       delegate_to: localhost
       run_once: true
       with_items: "{{ nodes }}"
