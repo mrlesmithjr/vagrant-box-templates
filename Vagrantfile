@@ -65,23 +65,35 @@ Vagrant.configure(2) do |config|
   # Iterate over nodes
   nodes.each do |node_id|
     config.vm.define node_id['name'] do |node|
-      unless node_id['synced_folder'].nil?
-        unless node_id['synced_folder']['type'].nil?
-          config.vm.synced_folder '.', '/vagrant', type: node_id['synced_folder']['type']
+      unless node_id['disable_synced_folders'].nil?
+        if node_id['disable_synced_folders']
+          config.vm.synced_folder '.', '/vagrant', disabled: true
         end
-      end
-
-      unless environment['synced_folders'].nil?
-        environment['synced_folders'].each do |folder|
-          config.vm.synced_folder folder['src'], folder['mountpoint'], type: folder['type']
+      else
+        unless node_id['synced_folder'].nil?
+          unless node_id['synced_folder']['type'].nil?
+            config.vm.synced_folder '.', '/vagrant', type: node_id['synced_folder']['type']
+          end
         end
-      end
 
-      config.vm.synced_folder 'playbooks', '/playbooks'
-      config.vm.synced_folder 'scripts', '/scripts'
+        unless environment['synced_folders'].nil?
+          environment['synced_folders'].each do |folder|
+            config.vm.synced_folder folder['src'], folder['mountpoint'], type: folder['type']
+          end
+        end
+
+        config.vm.synced_folder 'playbooks', '/playbooks'
+        config.vm.synced_folder 'scripts', '/scripts'
+      end
 
       node.vm.box = node_id['box']
-      node.vm.hostname = node_id['name']
+      unless node_id['manage_hostname'].nil?
+        if node_id['manage_hostname']
+          node.vm.hostname = node_id['name']
+        end
+      else
+        node.vm.hostname = node_id['name']
+      end
       node.vm.provider 'virtualbox' do |vbox|
         # Use linked clones - default: true unless defined in environment.yml
         # Define linked_clone: true|false in environment.yml per node
