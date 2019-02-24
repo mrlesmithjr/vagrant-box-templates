@@ -131,7 +131,9 @@ Vagrant.configure(2) do |config|
 
         # Add additional disk(s)
         unless node_id['disks'].nil?
-          dnum = 0
+          # Start at 1 to account for 2 disks in box image
+          # May need to figure out another way to do this, but for now it works
+          dnum = 1
           node_id['disks'].each do |disk_num|
             dnum = (dnum.to_i + 1)
             ddev = "#{node_id['name']}_Disk#{dnum}.vdi"
