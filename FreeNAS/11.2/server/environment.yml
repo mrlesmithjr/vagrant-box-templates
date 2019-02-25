@@ -18,14 +18,30 @@ nodes:
     box: mrlesmithjr/freenas112
     desktop: false
     disable_synced_folders: true
-    disks: []
-    interfaces: []
+    disks:
+      []
+      # - size: 10
+      #   controller: "SCSI Controller"
+      # - size: 10
+      #   controller: "SCSI Controller"
+      # - size: 10
+      #   controller: "SCSI Controller"
+      # - size: 10
+      #   controller: "SCSI Controller"
+    interfaces:
+      []
+      # - ip: 192.168.250.10
+      #   auto_config: false
+      #   method: static
+      # - ip: 192.168.250.20
+      #   auto_config: false
+      #   method: static
     linked_clone: true
     manage_hostname: false
-    mem: 2048
+    mem: 4096
     provision: false
     provisioners: []
-    vcpu: 1
+    vcpu: 2
     port_forwards:
       - guest: 80
         host: 8080
