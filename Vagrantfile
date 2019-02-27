@@ -182,7 +182,7 @@ Vagrant.configure(2) do |config|
           # Add additional disk(s)
           unless node_id['disks'].nil?
             vdiskmanager = 'vmware-vdiskmanager'
-            dnum = 0
+            dnum = 1
             vmdk_path = File.dirname(__FILE__)
             node_id['disks'].each do |disk_num|
               dnum = (dnum.to_i + 1)

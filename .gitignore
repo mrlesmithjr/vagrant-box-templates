@@ -6,3 +6,5 @@ group_vars/
 host_vars/
 logs/
 venv/
+*.vdi
+*.lck
