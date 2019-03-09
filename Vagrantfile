@@ -158,6 +158,13 @@ Vagrant.configure(2) do |config|
           vmw.vmx['memsize'] = node_id['mem']
           vmw.vmx['numvcpus'] = node_id['vcpu']
 
+          # Enable nested virtualization
+          unless node_id['nested_virtualization'].nil?
+            if node_id['nested_virtualization']
+              vmw.vmx['vhv.enable'] = true
+            end
+          end
+
           # Setup desktop environment
           unless node_id['desktop'].nil?
             if node_id['desktop']

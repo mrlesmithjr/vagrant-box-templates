@@ -4,32 +4,33 @@
 #
 # For node specific provisioners add at the node level
 provisioners: []
-  # - type: shell
-  #   inline: |
-  #       if [ -f /etc/os-release ]; then
-  #           os_name="$(awk -F= '/^NAME/{ print $2 }' /etc/os-release | sed 's/"//g')"
-  #           os_version_id="$(awk -F= '/^VERSION_ID/{ print $2}' /etc/os-release | sed 's/"//g')"
-  #           echo $os_name
-  #           echo $os_version_id
-  #       fi
-  #   privileged: true
-  # - type: shell
-  #   path:
-  #     - scripts/test.sh
-  #   privileged: false
-  # - type: ansible_local
-  #   playbooks:
-  #     - /vagrant/playbooks/test.yml
-  # - type: ansible
-  #   playbooks:
-  #     - playbooks/test.yml
+# - type: shell
+#   inline: |
+#       if [ -f /etc/os-release ]; then
+#           os_name="$(awk -F= '/^NAME/{ print $2 }' /etc/os-release | sed 's/"//g')"
+#           os_version_id="$(awk -F= '/^VERSION_ID/{ print $2}' /etc/os-release | sed 's/"//g')"
+#           echo $os_name
+#           echo $os_version_id
+#       fi
+#   privileged: true
+# - type: shell
+#   path:
+#     - scripts/test.sh
+#   privileged: false
+# - type: ansible_local
+#   playbooks:
+#     - /vagrant/playbooks/test.yml
+# - type: ansible
+#   playbooks:
+#     - playbooks/test.yml
 
 # Synced folders
 # Additional synced folders.
 # By default scripts and playbooks are synced, and available in each node as:
 # /playbooks, /scripts, /vagrant/playbooks, and /vagrant/scripts. They are
 # duplicated because of the symlinks within /vagrant. This is as designed.
-synced_folders: []
+synced_folders:
+  []
   # - type: nfs
   #   src: example1/
   #   mountpoint: /example1
@@ -45,12 +46,14 @@ nodes:
     box: mrlesmithjr/bionic64
     # Defines if nodes guest OS is a desktop flavor
     desktop: false
-    disks: []
+    disks:
+      []
       # - size: 10
       #   controller: "SATA Controller"
       # - size: 10
       #   controller: "SATA Controller"
-    interfaces: []
+    interfaces:
+      []
       # - ip: 192.168.250.10
       #   auto_config: true
       #   method: static
@@ -60,10 +63,14 @@ nodes:
       #   network_name: network-1
     linked_clone: true
     mem: 512
+    # Defines whether or not nested virtualization is enabled
+    # Currently only works on VMware boxes
+    nested_virtualization: false
     provision: false
     # Node specific provisioners
     # For Ansible, only ansible_local type will work
-    provisioners: []
+    provisioners:
+      []
       # - type: shell
       #   inline: |
       #       if [ -f /etc/os-release ]; then
@@ -81,7 +88,8 @@ nodes:
       #   playbooks:
       #     - /vagrant/playbooks/test.yml
     vcpu: 1
-    port_forwards: []
+    port_forwards:
+      []
       # - guest: 80
       #   host: 8080
       # - guest: 443

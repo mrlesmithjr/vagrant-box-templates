@@ -27,6 +27,7 @@
       - [Clone repo](#clone-repo)
       - [Choose distro](#choose-distro)
       - [Customizing environment](#customizing-environment)
+        - [Nested Virtualization](#nested-virtualization)
         - [Disks, interfaces, and port_forwards](#disks-interfaces-and-port_forwards)
         - [Provisioning](#provisioning)
         - [Linked Clones](#linked-clones)
@@ -332,6 +333,11 @@ number of nodes to spin up if desired.
 
 For examples of possible settings checkout the following test environment:
 [Test/dummy/server/environment.yml](Test/dummy/server/environment.yml)
+
+##### Nested Virtualization
+
+You can enable nested virtualization by defining/modifying the `nested_virtualization`
+parameter in a node definition. This currently **ONLY** works on VMware boxes.
 
 ##### Disks, interfaces, and port_forwards
 
