@@ -181,8 +181,8 @@ Vagrant.configure(2) do |config|
               # vmw.vmx['ethernet0.virtualdev'] = 'e1000'
               vmw.gui = true
               vmw.vmx['mks.enable3d'] = true
-            else
-              vmw.vmx['ethernet0.pcislotnumber'] = '33'
+            # else
+            #   vmw.vmx['ethernet0.pcislotnumber'] = '33'
             end
           end
 
