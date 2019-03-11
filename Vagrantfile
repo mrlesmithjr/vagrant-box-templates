@@ -177,6 +177,16 @@ Vagrant.configure(2) do |config|
               vmw.ssh_info_public = false
             end
           end
+
+          # Function HGFS in guest
+          unless node_id['functional_hgfs'].nil?
+            if node_id['functional_hgfs']
+              vmw.functional_hgfs = true
+            else
+              vmw.functional_hgfs = false
+            end
+          end
+
           # Setup desktop environment
           unless node_id['desktop'].nil?
             if node_id['desktop']

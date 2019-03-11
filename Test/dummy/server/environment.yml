@@ -52,6 +52,8 @@ nodes:
       #   controller: "SATA Controller"
       # - size: 10
       #   controller: "SATA Controller"
+    # https://www.vagrantup.com/docs/vmware/configuration.html#functional_hgfs
+    functional_hgfs: true
     interfaces:
       []
       # - ip: 192.168.250.10
