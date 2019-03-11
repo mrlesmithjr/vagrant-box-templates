@@ -46,6 +46,8 @@ nodes:
     box: mrlesmithjr/bionic64
     # Defines if nodes guest OS is a desktop flavor
     desktop: false
+    # Defines if synced folders should be disabled
+    disable_synced_folders: false
     disks:
       []
       # - size: 10
