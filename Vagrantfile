@@ -68,6 +68,10 @@ Vagrant.configure(2) do |config|
       unless node_id['disable_synced_folders'].nil?
         if node_id['disable_synced_folders']
           config.vm.synced_folder '.', '/vagrant', disabled: true
+        else
+          config.vm.synced_folder '.', '/vagrant'
+          config.vm.synced_folder 'playbooks', '/playbooks'
+          config.vm.synced_folder 'scripts', '/scripts'
         end
       else
         unless node_id['synced_folder'].nil?
