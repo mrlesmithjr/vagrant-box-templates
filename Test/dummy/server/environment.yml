@@ -87,6 +87,8 @@ nodes:
       # - type: ansible_local
       #   playbooks:
       #     - /vagrant/playbooks/test.yml
+    # https://www.vagrantup.com/docs/vmware/configuration.html#ssh_info_public
+    ssh_use_public_ip: false
     vcpu: 1
     port_forwards:
       []

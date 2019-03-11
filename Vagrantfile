@@ -169,6 +169,14 @@ Vagrant.configure(2) do |config|
             end
           end
 
+          # Allow public IP SSH connection
+          unless node_id['ssh_use_public_ip'].nil?
+            if node_id['ssh_use_public_ip']
+              vmw.ssh_info_public = true
+            else
+              vmw.ssh_info_public = false
+            end
+          end
           # Setup desktop environment
           unless node_id['desktop'].nil?
             if node_id['desktop']
