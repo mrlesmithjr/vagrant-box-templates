@@ -23,6 +23,8 @@ nodes:
     mem: 1024
     provision: false
     provisioners: []
+    synced_folder:
+      type: rsync
     vcpu: 1
     port_forwards: []
     windows: false
