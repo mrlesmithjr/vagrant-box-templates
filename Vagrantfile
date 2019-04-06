@@ -76,18 +76,25 @@ Vagrant.configure(2) do |config|
       else
         unless node_id['synced_folder'].nil?
           unless node_id['synced_folder']['type'].nil?
-            config.vm.synced_folder '.', '/vagrant', type: node_id['synced_folder']['type']
+            if node_id['synced_folder']['type'] = 'rsync'
+              config.vm.synced_folder '.', '/vagrant', type: 'rsync', rsync__args: ["--verbose", "--archive", "--delete", "-z"]
+              config.vm.synced_folder 'playbooks', '/playbooks', type: 'rsync', rsync__args: ["--verbose", "--archive", "--delete", "-z"]
+              config.vm.synced_folder 'scripts', '/scripts', type: 'rsync', rsync__args: ["--verbose", "--archive", "--delete", "-z"]
+            else
+              config.vm.synced_folder '.', '/vagrant', type: node_id['synced_folder']['type']
+              config.vm.synced_folder 'playbooks', '/playbooks', type: node_id['synced_folder']['type']
+              config.vm.synced_folder 'scripts', '/scripts', type: node_id['synced_folder']['type']
+            end
           end
+        else
+          config.vm.synced_folder 'playbooks', '/playbooks'
+          config.vm.synced_folder 'scripts', '/scripts'
         end
-
         unless environment['synced_folders'].nil?
           environment['synced_folders'].each do |folder|
             config.vm.synced_folder folder['src'], folder['mountpoint'], type: folder['type']
           end
         end
-
-        config.vm.synced_folder 'playbooks', '/playbooks'
-        config.vm.synced_folder 'scripts', '/scripts'
       end
 
       node.vm.box = node_id['box']
