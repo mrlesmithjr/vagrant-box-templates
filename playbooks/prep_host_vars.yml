@@ -100,7 +100,7 @@
       lineinfile:
         dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
         regexp: "^ansible_port{{ ':' }}"
-        line: "ansible_port{{ ':' }} 5985"
+        line: "ansible_port{{ ':' }} 5986"
         state: present
       delegate_to: localhost
       run_once: true

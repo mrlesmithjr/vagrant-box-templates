@@ -105,6 +105,17 @@ Vagrant.configure(2) do |config|
       else
         node.vm.hostname = node_id['name']
       end
+
+      # Setup Windows communication
+      unless node_id['windows'].nil?
+        if node_id['windows']
+          node.vm.guest = :windows
+          node.vm.communicator = :winrm
+          config.winrm.transport = :ssl
+          config.winrm.ssl_peer_verification = false
+        end
+      end
+
       node.vm.provider 'virtualbox' do |vbox|
         # Use linked clones - default: true unless defined in environment.yml
         # Define linked_clone: true|false in environment.yml per node
@@ -129,8 +140,6 @@ Vagrant.configure(2) do |config|
         # Setup Windows Server
         unless node_id['windows'].nil?
           if node_id['windows']
-            node.vm.guest = :windows
-            node.vm.communicator = :winrm
             vbox.default_nic_type = "82540EM"
             vbox.gui = true
             vbox.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
@@ -205,8 +214,6 @@ Vagrant.configure(2) do |config|
           # Setup Windows Server
           unless node_id['windows'].nil?
             if node_id['windows']
-              node.vm.guest = :windows
-              node.vm.communicator = :winrm
               # vmw.vmx['ethernet0.virtualdev'] = 'e1000'
               vmw.gui = true
               vmw.vmx['mks.enable3d'] = true
