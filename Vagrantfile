@@ -279,6 +279,14 @@ Vagrant.configure(2) do |config|
         end
       end
 
+      # Windows RDP
+      unless node_id['windows'].nil?
+        if node_id['windows']
+          node.vm.network "forwarded_port", guest: 3389, host: 3389, \
+            host_ip: "127.0.0.1"
+        end
+      end
+
       # Provisioners
       unless node_id['provision'].nil?
         if node_id['provision']
