@@ -65,7 +65,48 @@ Vagrant.configure(2) do |config|
   # Iterate over nodes
   nodes.each do |node_id|
     config.vm.define node_id['name'] do |node|
-      unless node_id['disable_synced_folders'].nil?
+      if node_id['disable_synced_folders'].nil?
+        if node_id['synced_folder'].nil?
+          config.vm.synced_folder 'playbooks', '/playbooks'
+          config.vm.synced_folder 'scripts', '/scripts'
+        else
+          unless node_id['synced_folder']['type'].nil?
+            if node_id['synced_folder']['type'] == 'rsync'
+              config.vm.synced_folder '.',
+                                      '/vagrant',
+                                      type: 'rsync',
+                                      rsync__args: ['--verbose', '--archive',
+                                                    '--delete', '-z']
+              config.vm.synced_folder 'playbooks',
+                                      '/playbooks',
+                                      type: 'rsync',
+                                      rsync__args: ['--verbose', '--archive',
+                                                    '--delete', '-z']
+              config.vm.synced_folder 'scripts',
+                                      '/scripts',
+                                      type: 'rsync',
+                                      rsync__args: ['--verbose', '--archive',
+                                                    '--delete', '-z']
+            else
+              config.vm.synced_folder '.',
+                                      '/vagrant',
+                                      type: node_id['synced_folder']['type']
+              config.vm.synced_folder 'playbooks',
+                                      '/playbooks',
+                                      type: node_id['synced_folder']['type']
+              config.vm.synced_folder 'scripts',
+                                      '/scripts',
+                                      type: node_id['synced_folder']['type']
+            end
+          end
+        end
+        unless environment['synced_folders'].nil?
+          environment['synced_folders'].each do |folder|
+            config.vm.synced_folder folder['src'], folder['mountpoint'],
+                                    type: folder['type']
+          end
+        end
+      else
         if node_id['disable_synced_folders']
           config.vm.synced_folder '.', '/vagrant', disabled: true
         else
@@ -73,37 +114,13 @@ Vagrant.configure(2) do |config|
           config.vm.synced_folder 'playbooks', '/playbooks'
           config.vm.synced_folder 'scripts', '/scripts'
         end
-      else
-        unless node_id['synced_folder'].nil?
-          unless node_id['synced_folder']['type'].nil?
-            if node_id['synced_folder']['type'] = 'rsync'
-              config.vm.synced_folder '.', '/vagrant', type: 'rsync', rsync__args: ["--verbose", "--archive", "--delete", "-z"]
-              config.vm.synced_folder 'playbooks', '/playbooks', type: 'rsync', rsync__args: ["--verbose", "--archive", "--delete", "-z"]
-              config.vm.synced_folder 'scripts', '/scripts', type: 'rsync', rsync__args: ["--verbose", "--archive", "--delete", "-z"]
-            else
-              config.vm.synced_folder '.', '/vagrant', type: node_id['synced_folder']['type']
-              config.vm.synced_folder 'playbooks', '/playbooks', type: node_id['synced_folder']['type']
-              config.vm.synced_folder 'scripts', '/scripts', type: node_id['synced_folder']['type']
-            end
-          end
-        else
-          config.vm.synced_folder 'playbooks', '/playbooks'
-          config.vm.synced_folder 'scripts', '/scripts'
-        end
-        unless environment['synced_folders'].nil?
-          environment['synced_folders'].each do |folder|
-            config.vm.synced_folder folder['src'], folder['mountpoint'], type: folder['type']
-          end
-        end
       end
 
       node.vm.box = node_id['box']
-      unless node_id['manage_hostname'].nil?
-        if node_id['manage_hostname']
-          node.vm.hostname = node_id['name']
-        end
-      else
+      if node_id['manage_hostname'].nil?
         node.vm.hostname = node_id['name']
+      else
+        node.vm.hostname = node_id['name'] if node_id['manage_hostname']
       end
 
       # Setup Windows communication
@@ -119,7 +136,7 @@ Vagrant.configure(2) do |config|
       node.vm.provider 'virtualbox' do |vbox|
         # Use linked clones - default: true unless defined in environment.yml
         # Define linked_clone: true|false in environment.yml per node
-        vbox.linked_clone = node_id['linked_clone']||= true
+        vbox.linked_clone = node_id['linked_clone'] ||= true
 
         vbox.memory = node_id['mem']
         vbox.cpus = node_id['vcpu']
@@ -140,8 +157,9 @@ Vagrant.configure(2) do |config|
         # Setup Windows Server
         unless node_id['windows'].nil?
           if node_id['windows']
-            vbox.default_nic_type = "82540EM"
-            vbox.gui = true
+            vbox.default_nic_type = '82540EM'
+            # We set this to false because we can use vagrant rdp
+            vbox.gui = false
             vbox.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
             vbox.customize ['modifyvm', :id, '--accelerate3d', 'on']
             vbox.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
@@ -160,47 +178,46 @@ Vagrant.configure(2) do |config|
             dsize = disk_num['size'].to_i * 1024
             unless File.file?(ddev.to_s)
               vbox.customize ['createhd', '--filename', ddev.to_s, \
-                            '--variant', 'Fixed', '--size', dsize]
+                              '--variant', 'Fixed', '--size', dsize]
             end
             vbox.customize ['storageattach', :id, '--storagectl', \
-                          (disk_num['controller']).to_s, '--port', dnum, '--device', 0, \
-                          '--type', 'hdd', '--medium', ddev.to_s]
+                            (disk_num['controller']).to_s, '--port', dnum, \
+                            '--device', 0, '--type', 'hdd', \
+                            '--medium', ddev.to_s]
           end
         end
       end
 
-      ['vmware_desktop', 'vmware_fusion'].each do |vmware|
+      %w[vmware_desktop vmware_fusion].each do |vmware|
         node.vm.provider vmware do |vmw|
           # Use linked clones - default: true unless defined in environment.yml
           # Define linked_clone: true|false in environment.yml per node
-          vmw.linked_clone = node_id['linked_clone']||= true
+          vmw.linked_clone = node_id['linked_clone'] ||= true
 
           vmw.vmx['memsize'] = node_id['mem']
           vmw.vmx['numvcpus'] = node_id['vcpu']
 
           # Enable nested virtualization
           unless node_id['nested_virtualization'].nil?
-            if node_id['nested_virtualization']
-              vmw.vmx['vhv.enable'] = true
-            end
+            vmw.vmx['vhv.enable'] = true if node_id['nested_virtualization']
           end
 
           # Allow public IP SSH connection
           unless node_id['ssh_use_public_ip'].nil?
-            if node_id['ssh_use_public_ip']
-              vmw.ssh_info_public = true
-            else
-              vmw.ssh_info_public = false
-            end
+            vmw.ssh_info_public = if node_id['ssh_use_public_ip']
+                                    true
+                                  else
+                                    false
+                                  end
           end
 
           # Function HGFS in guest
           unless node_id['functional_hgfs'].nil?
-            if node_id['functional_hgfs']
-              vmw.functional_hgfs = true
-            else
-              vmw.functional_hgfs = false
-            end
+            vmw.functional_hgfs = if node_id['functional_hgfs']
+                                    true
+                                  else
+                                    false
+                                  end
           end
 
           # Setup desktop environment
@@ -215,10 +232,11 @@ Vagrant.configure(2) do |config|
           unless node_id['windows'].nil?
             if node_id['windows']
               # vmw.vmx['ethernet0.virtualdev'] = 'e1000'
-              vmw.gui = true
+              # We set this to false because we can use vagrant rdp
+              vmw.gui = false
               vmw.vmx['mks.enable3d'] = true
-            # else
-            #   vmw.vmx['ethernet0.pcislotnumber'] = '33'
+              # else
+              #   vmw.vmx['ethernet0.pcislotnumber'] = '33'
             end
           end
 
@@ -234,7 +252,7 @@ Vagrant.configure(2) do |config|
               unless File.file?(ddev)
                 `#{vdiskmanager} -c -s #{dsize} -a lsilogic -t 0 #{ddev}`
               end
-              vmw.vmx["scsi0:#{dnum}.filename"] = "#{ddev}"
+              vmw.vmx["scsi0:#{dnum}.filename"] = ddev.to_s
               vmw.vmx["scsi0:#{dnum}.present"] = true
               vmw.vmx["scsi0:#{dnum}.redo"] = ''
             end
@@ -247,25 +265,27 @@ Vagrant.configure(2) do |config|
         node_id['interfaces'].each do |int|
           if int['method'] == 'dhcp'
             if int['network_name'] == 'None'
-              node.vm.network :private_network, \
+              node.vm.network 'private_network',
                               type: 'dhcp'
             end
             if int['network_name'] != 'None'
-              node.vm.network :private_network, \
-                              virtualbox__intnet: int['network_name'], \
+              node.vm.network 'private_network',
+                              virtualbox__intnet: int['network_name'],
                               type: 'dhcp'
             end
           end
           next unless int['method'] == 'static'
+
           if int['network_name'] == 'None'
-            node.vm.network :private_network, \
-                            ip: int['ip'], \
+            node.vm.network 'private_network',
+                            ip: int['ip'],
                             auto_config: int['auto_config']
           end
           next unless int['network_name'] != 'None'
-          node.vm.network :private_network, \
-                          virtualbox__intnet: int['network_name'], \
-                          ip: int['ip'], \
+
+          node.vm.network 'private_network',
+                          virtualbox__intnet: int['network_name'],
+                          ip: int['ip'],
                           auto_config: int['auto_config']
         end
       end
@@ -273,17 +293,16 @@ Vagrant.configure(2) do |config|
       # Port Forwards
       unless node_id['port_forwards'].nil?
         node_id['port_forwards'].each do |pf|
-          node.vm.network :forwarded_port, \
-                          guest: pf['guest'], \
-                          host: pf['host']
+          node.vm.network 'forwarded_port', guest: pf['guest'],
+                                            host: pf['host']
         end
       end
 
       # Windows RDP
       unless node_id['windows'].nil?
         if node_id['windows']
-          node.vm.network "forwarded_port", guest: 3389, host: 3389, \
-            host_ip: "127.0.0.1"
+          node.vm.network 'forwarded_port', guest: 3389, host: 3389,
+                                            host_ip: '127.0.0.1'
         end
       end
 
@@ -293,7 +312,8 @@ Vagrant.configure(2) do |config|
           unless node_id['windows'].nil?
             # runs initial script
             if node_id['windows']
-              node.vm.provision 'shell', path: 'scripts/ConfigureRemotingForAnsible.ps1'
+              node.vm.provision 'shell',
+                                path: 'scripts/ConfigureRemotingForAnsible.ps1'
             else
               node.vm.provision 'shell', path: 'scripts/bootstrap.sh'
             end
@@ -305,17 +325,21 @@ Vagrant.configure(2) do |config|
                   $script = <<-SCRIPT
                   #{provisioner['inline']}
                   SCRIPT
-                  node.vm.provision 'shell', inline: $script, privileged: provisioner['privileged']
+                  node.vm.provision 'shell',
+                                    inline: $script,
+                                    privileged: provisioner['privileged']
                 end
                 unless provisioner['path'].nil?
                   provisioner['path'].each do |script|
-                    node.vm.provision 'shell', path: script, privileged: script['privileged']
+                    node.vm.provision 'shell',
+                                      path: script,
+                                      privileged: script['privileged']
                   end
                 end
               elsif provisioner['type'] == 'ansible_local'
                 provisioner['playbooks'].each do |playbook|
                   node.vm.provision 'ansible_local' do |ansible|
-                    ansible.install_mode = "pip"
+                    ansible.install_mode = 'pip'
                     ansible.playbook = playbook
                   end
                 end
@@ -329,17 +353,21 @@ Vagrant.configure(2) do |config|
                   $script = <<-SCRIPT
                   #{provisioner['inline']}
                   SCRIPT
-                  node.vm.provision 'shell', inline: $script, privileged: provisioner['privileged']
+                  node.vm.provision 'shell',
+                                    inline: $script,
+                                    privileged: provisioner['privileged']
                 end
                 unless provisioner['path'].nil?
                   provisioner['path'].each do |script|
-                    node.vm.provision 'shell', path: script, privileged: script['privileged']
+                    node.vm.provision 'shell',
+                                      path: script,
+                                      privileged: script['privileged']
                   end
                 end
               elsif provisioner['type'] == 'ansible_local'
                 provisioner['playbooks'].each do |playbook|
                   node.vm.provision 'ansible_local' do |ansible|
-                    ansible.install_mode = "pip"
+                    ansible.install_mode = 'pip'
                     ansible.playbook = playbook
                   end
                 end
@@ -349,7 +377,7 @@ Vagrant.configure(2) do |config|
           if node_id == num_nodes
             # We only run Ansible playbooks when our host is not Windows
             # This does not affect ansible_local provisioners
-            if not Vagrant::Util::Platform.windows?
+            unless Vagrant::Util::Platform.windows?
               node.vm.provision 'ansible' do |ansible|
                 ansible.limit = 'all'
                 # Sets up host_vars
@@ -364,18 +392,18 @@ Vagrant.configure(2) do |config|
               end
               unless environment['provisioners'].nil?
                 environment['provisioners'].each do |provisioner|
-                  if provisioner['type'] == 'ansible'
-                    provisioner['playbooks'].each do |playbook|
-                      node.vm.provision 'ansible' do |ansible|
-                        ansible.limit = 'all'
-                        ansible.playbook = playbook
-                        ansible.groups = ansible_groups
-                      end
+                  next unless provisioner['type'] == 'ansible'
+
+                  provisioner['playbooks'].each do |playbook|
+                    node.vm.provision 'ansible' do |ansible|
+                      ansible.limit = 'all'
+                      ansible.playbook = playbook
+                      ansible.groups = ansible_groups
                     end
                   end
                 end
               end
-              # We run this last to ensure all previous provisioning has been done
+              # We run this last to ensure all previous provisioning completes
               node.vm.provision 'ansible' do |ansible|
                 ansible.limit = 'all'
                 # runs Ansible playbook for installing roles/executing tasks
