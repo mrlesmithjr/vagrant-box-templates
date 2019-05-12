@@ -33,8 +33,7 @@
       - python-devel
       - python-pip
       - python-setuptools
-    update_host_vars: true
-  roles:
+  roles: []
   tasks:
     # Update apt-cache to ensure up to date
     - name: Updating Apt Cache (Debian)
@@ -62,8 +61,8 @@
         - py-pip
         - python-dev
       when: >
-            ansible_os_family == "Alpine" and
-            ansible_distribution_version < "3.5"
+        ansible_os_family == "Alpine" and
+        ansible_distribution_version < "3.5"
 
     - name: Installing Python Packages (Alpine)
       apk:
@@ -74,8 +73,8 @@
         - py2-pip
         - python2-dev
       when: >
-            ansible_os_family == "Alpine" and
-            ansible_distribution_version >= "3.5"
+        ansible_os_family == "Alpine" and
+        ansible_distribution_version >= "3.5"
 
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (Debian)
@@ -84,8 +83,8 @@
         state: present
       become: true
       when: >
-            install_ansible and
-            ansible_os_family == "Debian"
+        install_ansible and
+        ansible_os_family == "Debian"
 
     - name: Installing EPEL Repo (RedHat)
       yum:
@@ -93,9 +92,9 @@
         state: present
       become: true
       when: >
-            install_ansible and
-            ansible_os_family == "RedHat" and
-            ansible_distribution != "Fedora"
+        install_ansible and
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
 
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (RedHat)
@@ -104,9 +103,9 @@
         state: present
       become: true
       when: >
-            install_ansible and
-            ansible_os_family == "RedHat" and
-            ansible_distribution != "Fedora"
+        install_ansible and
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
 
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (Fedora)
@@ -115,9 +114,9 @@
         state: present
       become: true
       when: >
-            install_ansible and
-            ansible_os_family == "RedHat" and
-            ansible_distribution == "Fedora"
+        install_ansible and
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
 
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (Fedora)
@@ -126,9 +125,9 @@
         state: present
       become: true
       when: >
-            install_ansible and
-            ansible_os_family == "RedHat" and
-            ansible_distribution == "Fedora"
+        install_ansible and
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
 
     # Install pre-reqs for Ansible install
     - name: Installing Ansible Pre-Reqs (openSUSE)
@@ -137,8 +136,8 @@
         state: present
       become: true
       when: >
-          install_ansible and
-          ansible_os_family == "Suse"
+        install_ansible and
+        ansible_os_family == "Suse"
 
     # Upgrading these packages to ensure a successful Ansible install
     - name: Updating Python Modules
@@ -174,5 +173,37 @@
         version: "{{ ansible_ver }}"
       become: true
       when: >
-            install_ansible and
-            ansible_os_family != "Windows"
+        install_ansible and
+        ansible_os_family != "Windows"
+
+    - name: Enabling Windows AutoLogon
+      win_regedit:
+        path: HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name: "{{ item['name'] }}"
+        data: "{{ item['data'] }}"
+        type: "{{ item['type'] }}"
+      loop:
+        - name: AutoAdminLogon
+          data: 1
+          type: String
+        - name: AutoAdminLogonCount
+          data: 0
+          type: dword
+        - name: DefaultUsername
+          data: vagrant
+          type: String
+        - name: DefaultPassword
+          data: vagrant
+          type: String
+      register: windows_autologon
+      when: ansible_os_family == "Windows"
+
+    - name: Reboot Windows after AutoLogon
+      win_reboot:
+      when: windows_autologon['changed']
+
+    - name: Ensure Chocolatey is installed
+      win_chocolatey:
+        name: chocolatey
+        state: present
+      when: ansible_os_family == "Windows"
