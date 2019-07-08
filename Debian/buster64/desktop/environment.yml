@@ -1,0 +1,28 @@
+---
+# License: MIT
+
+# Author Information
+# Larry Smith Jr.
+# http://everythingshouldbevirtual.com
+# https://www.twitter.com/mrlesmithjr
+# mrlesmithjr@gmail.com
+
+# To view available options and settings reference the environment.yml in
+# Test/dummy/server/environment.yml
+provisioners: []
+synced_folders: []
+nodes:
+  - name: node0
+    ansible_groups:
+      - test_nodes
+    box: mrlesmithjr/buster64-desktop
+    desktop: true
+    disks: []
+    interfaces: []
+    linked_clone: true
+    mem: 1024
+    provision: false
+    provisioners: []
+    vcpu: 1
+    port_forwards: []
+    windows: false
