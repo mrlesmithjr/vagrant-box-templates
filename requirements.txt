@@ -2,4 +2,4 @@ ansible==2.7.2
 GitPython==2.1.11
 Jinja2==2.10
 pywinrm==0.2.2
-PyYAML==3.13
+PyYAML==5.1
