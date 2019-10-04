@@ -1,4 +1,4 @@
-ansible==2.7.2
+ansible==2.7.12
 ansible-lint==4.1.0
 asn1crypto==0.24.0
 astroid==1.6.5
