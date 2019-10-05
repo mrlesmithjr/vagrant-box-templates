@@ -29,8 +29,13 @@ if [ -f /etc/redhat-release ]; then
             sudo dnf -y install python-devel python-dnf
             sudo dnf -y groupinstall "Development Tools"
         else
-            sudo yum -y install python-devel
-            sudo yum -y groupinstall "Development Tools"
+           if [[ $os_version_id -lt 8 ]]; then
+               sudo yum -y install python-devel
+               sudo yum -y groupinstall "Development Tools"
+           else
+               sudo yum -y install platform-python-devel
+               sudo yum -y groupinstall "Development Tools"
+           fi
         fi
     fi
 fi
