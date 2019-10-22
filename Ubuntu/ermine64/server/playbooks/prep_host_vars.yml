@@ -1,0 +1,188 @@
+---
+- hosts: all
+  gather_facts: false
+  vars:
+    group_vars_dir: "{{ working_dir + '/' + vagrant_dir + '/group_vars' }}"
+    host_vars_dir: "{{ working_dir + '/' + vagrant_dir + '/host_vars' }}"
+    nodes: "{{ (lookup('file', working_dir + '/environment.yml')|from_yaml)['nodes'] }}"
+    vagrant_dir: .vagrant/provisioners/ansible/inventory
+    working_dir: "{{ lookup('env', 'PWD') }}"
+  tasks:
+    - name: Ensuring group_vars Directory Exists
+      file:
+        path: "{{ group_vars_dir }}"
+        state: directory
+      delegate_to: localhost
+      run_once: true
+
+    - name: Ensuring host_vars Directory Exists
+      file:
+        path: "{{ host_vars_dir }}"
+        state: directory
+      delegate_to: localhost
+      run_once: true
+
+    - name: Ensuring Host File Exists In host_vars
+      stat:
+        path: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+      delegate_to: localhost
+      run_once: true
+      register: host_var
+      with_items: "{{ nodes }}"
+
+    - name: Creating Missing host_vars
+      file:
+        path: "{{ host_vars_dir }}/{{ item['item']['name'] }}.yml"
+        state: touch
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ host_var['results'] }}"
+      when: not item['stat']['exists']
+
+    - name: Updating ansible_host
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_host{{ ':' }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['interfaces'] is defined and
+        item['interfaces'] == []) or
+        item['interfaces'] is not defined
+
+    - name: Updating ansible_host
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_host{{ ':' }}"
+        line: "ansible_host{{ ':' }} {{ item['interfaces'][0]['ip'] }}"
+        state: present
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        item['interfaces'] is defined and
+        item['interfaces'] != [] and
+        item['interfaces'][0]['auto_config']
+
+    - name: Updating ansible_port
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_port{{ ':' }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['interfaces'] is defined and
+        item['interfaces'] == []) or
+        item['interfaces'] is not defined
+
+    - name: Updating ansible_port
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_port{{ ':' }}"
+        line: "ansible_port{{ ':' }} 22"
+        state: present
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['interfaces'] is defined and
+        item['interfaces'] != [] and
+        item['interfaces'][0]['auto_config']) and
+        ((item['windows'] is defined and
+        not item['windows']) or
+        item['windows'] is not defined)
+
+    - name: Updating ansible_port
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_port{{ ':' }}"
+        line: "ansible_port{{ ':' }} 5986"
+        state: present
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['interfaces'] is defined and
+        item['interfaces'] != [] and
+        item['interfaces'][0]['auto_config']) and
+        (item['windows'] is defined and
+        item['windows'])
+
+    - name: Updating ansible_connection
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_connection{{ ':' }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['windows'] is defined and
+        not item['windows']) or
+        item['windows'] is not defined
+
+    - name: Updating ansible_connection
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_connection{{ ':' }}"
+        line: "ansible_connection{{ ':' }} winrm"
+        state: present
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['windows'] is defined and
+        item['windows'])
+
+    - name: Updating ansible_winrm_server_cert_validation
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_winrm_server_cert_validation{{ ':' }}"
+        state: absent
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['windows'] is defined and
+        not item['windows']) or
+        item['windows'] is not defined
+
+    - name: Updating ansible_winrm_server_cert_validation
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_winrm_server_cert_validation{{ ':' }}"
+        line: "ansible_winrm_server_cert_validation{{ ':' }} ignore"
+        state: present
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['windows'] is defined and
+        item['windows'])
+
+    - name: Updating ansible_user
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_user{{ ':' }}"
+        line: "ansible_user{{ ':' }} vagrant"
+        state: present
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+
+    - name: Updating ansible_password
+      lineinfile:
+        dest: "{{ host_vars_dir }}/{{ item['name'] }}.yml"
+        regexp: "^ansible_password{{ ':' }}"
+        line: "ansible_password{{ ':' }} vagrant"
+        state: present
+      delegate_to: localhost
+      run_once: true
+      with_items: "{{ nodes }}"
+      when: >
+        (item['windows'] is defined and
+        item['windows'])
