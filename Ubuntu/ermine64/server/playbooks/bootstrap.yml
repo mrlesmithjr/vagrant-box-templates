@@ -1,0 +1,198 @@
+---
+- hosts: all
+  vars:
+    alpine_packages:
+      - alpine-sdk
+      - libffi-dev
+      - openssl-dev
+      - py-setuptools
+    ansible_ver: 2.6.2
+    debian_packages:
+      - build-essential
+      - libffi-dev
+      - libssl-dev
+      - python-dev
+      - python-pip
+      - python-setuptools
+    install_ansible: false
+    pri_domain_name: vagrant.local
+    redhat_packages:
+      - gmp-devel
+      - libffi-devel
+      - openssl-devel
+      - python-crypto
+      - python-devel
+      - python-pip
+      - python-setuptools
+      - redhat-rpm-config
+    suse_packages:
+      - gmp-devel
+      - libffi-devel
+      - openssl-devel
+      - python-crypto
+      - python-devel
+      - python-pip
+      - python-setuptools
+  roles: []
+  tasks:
+    # Update apt-cache to ensure up to date
+    - name: Updating Apt Cache (Debian)
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+      when: ansible_os_family == "Debian"
+
+    # Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Alpine)
+      apk:
+        name: "{{ alpine_packages }}"
+        state: present
+      become: true
+      when: ansible_os_family == "Alpine"
+
+    - name: Installing Python Packages (Alpine)
+      apk:
+        name: ["py-pip", "python-dev"]
+        state: present
+      become: true
+      when: >
+        ansible_os_family == "Alpine" and
+        ansible_distribution_version < "3.5"
+
+    - name: Installing Python Packages (Alpine)
+      apk:
+        name: ["py2-pip", "python2-dev"]
+        state: present
+      become: true
+      when: >
+        ansible_os_family == "Alpine" and
+        ansible_distribution_version >= "3.5"
+
+    # Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Debian)
+      apt:
+        name: "{{ debian_packages }}"
+        state: present
+      become: true
+      when: >
+        install_ansible and
+        ansible_os_family == "Debian"
+
+    - name: Installing EPEL Repo (RedHat)
+      yum:
+        name: epel-release
+        state: present
+      become: true
+      when: >
+        install_ansible and
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
+    # Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (RedHat)
+      yum:
+        name: "{{ redhat_packages }}"
+        state: present
+      become: true
+      when: >
+        install_ansible and
+        ansible_os_family == "RedHat" and
+        ansible_distribution != "Fedora"
+
+    # Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Fedora)
+      dnf:
+        name: python-dnf
+        state: present
+      become: true
+      when: >
+        install_ansible and
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
+
+    # Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (Fedora)
+      dnf:
+        name: "{{ redhat_packages }}"
+        state: present
+      become: true
+      when: >
+        install_ansible and
+        ansible_os_family == "RedHat" and
+        ansible_distribution == "Fedora"
+
+    # Install pre-reqs for Ansible install
+    - name: Installing Ansible Pre-Reqs (openSUSE)
+      zypper:
+        name: "{{ suse_packages }}"
+        state: present
+      become: true
+      when: >
+        install_ansible and
+        ansible_os_family == "Suse"
+
+    # Upgrading these packages to ensure a successful Ansible install
+    - name: Updating Python Modules
+      block:
+        - name: Update Python Modules
+          pip:
+            name: ["pip", "cffi", "pyOpenSSL"]
+            state: latest
+          become: true
+          when: ansible_os_family != "Windows"
+
+      rescue:
+        - name: Downloading Pip Installer
+          get_url:
+            url: https://bootstrap.pypa.io/get-pip.py
+            dest: /tmp/get-pip.py
+
+        - name: Installing Python Pip
+          command: python /tmp/get-pip.py
+          become: true
+
+      when: install_ansible
+
+    # Install Ansible to run Ansible related tasks within guest
+    - name: Installing Ansible
+      pip:
+        name: ansible
+        state: present
+        version: "{{ ansible_ver }}"
+      become: true
+      when: >
+        install_ansible and
+        ansible_os_family != "Windows"
+
+    - name: Enabling Windows AutoLogon
+      win_regedit:
+        path: HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+        name: "{{ item['name'] }}"
+        data: "{{ item['data'] }}"
+        type: "{{ item['type'] }}"
+      loop:
+        - name: AutoAdminLogon
+          data: 1
+          type: String
+        - name: AutoAdminLogonCount
+          data: 0
+          type: dword
+        - name: DefaultUsername
+          data: vagrant
+          type: String
+        - name: DefaultPassword
+          data: vagrant
+          type: String
+      register: windows_autologon
+      when: ansible_os_family == "Windows"
+
+    - name: Reboot Windows after AutoLogon
+      win_reboot:
+      when: windows_autologon['changed']
+
+    - name: Ensure Chocolatey is installed
+      win_chocolatey:
+        name: chocolatey
+        state: present
+      when: ansible_os_family == "Windows"
