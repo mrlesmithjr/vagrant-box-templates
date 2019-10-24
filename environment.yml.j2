@@ -9,16 +9,10 @@
 
 # To view available options and settings reference the environment.yml in
 # Test/dummy/server/environment.yml
-
-{%- if environment['provisioners'] != [] %}
 provisioners: {{ environment['provisioners'] }}
-{% else %}
-provisioners: []
-{%- endif %}
-
-{%- if environment['synced_folders'] != [] and environment['synced_folders'] is not none %}
+{%- if environment['synced_folders'] is not none %}
 synced_folders: {{ environment['synced_folders'] }}
-{% else %}
+{%- else %}
 synced_folders: []
 {%- endif %}
 
@@ -36,6 +30,9 @@ nodes:
 {%      endif %}
     box: {{ node['box'] }}
     desktop: {{ node['desktop']|lower }}
+{%-     if node['disable_synced_folders'] is not none %}
+    disable_synced_folders: {{ node['disable_synced_folders']|lower }}
+{%-     endif %}
     disks: {{ node['disks'] }}
 {%-     if node['interfaces'] != [] %}
     interfaces:
@@ -51,6 +48,9 @@ nodes:
     interfaces: []
 {%-     endif %}
     linked_clone: {{ node['linked_clone']|lower }}
+{%-     if node['manage_hostname'] is not none %}
+    manage_hostname: {{ node['manage_hostname']|lower }}
+{%-     endif %}
     mem: {{ node['mem'] }}
     provision: {{ node['provision']|lower }}
     provisioners: {{ node['provisioners'] }}
