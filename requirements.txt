@@ -1,5 +1,5 @@
-ansible==2.7.12
-GitPython==2.1.11
-Jinja2==2.10
+ansible==2.8.6
+GitPython==3.0.4
+Jinja2==2.10.3
 pywinrm==0.2.2
-PyYAML==5.1
+PyYAML==5.1.2
