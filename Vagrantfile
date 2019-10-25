@@ -146,7 +146,7 @@ Vagrant.configure(2) do |config|
           if node_id['desktop']
             vbox.gui = true
             vbox.customize ['modifyvm', :id, '--accelerate3d', 'on']
-            vbox.customize ['modifyvm', :id, '--graphicscontroller', 'vboxvga']
+            vbox.customize ['modifyvm', :id, '--graphicscontroller', 'vmsvga']
             vbox.customize ['modifyvm', :id, '--hwvirtex', 'on']
             vbox.customize ['modifyvm', :id, '--ioapic', 'on']
             vbox.customize ['modifyvm', :id, '--vram', '128']
@@ -162,6 +162,7 @@ Vagrant.configure(2) do |config|
             vbox.gui = false
             vbox.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
             vbox.customize ['modifyvm', :id, '--accelerate3d', 'on']
+            vbox.customize ['modifyvm', :id, '--graphicscontroller', 'vboxsvga']
             vbox.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
             vbox.customize ['modifyvm', :id, '--vram', '128']
           end
