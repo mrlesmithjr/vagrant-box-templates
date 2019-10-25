@@ -1,10 +1,1 @@
-.vagrant/
-.vscode/
-*.retry
-*.vmdk
-group_vars/
-host_vars/
-logs/
-venv/
-*.vdi
-*.lck
+../../../.gitignore
