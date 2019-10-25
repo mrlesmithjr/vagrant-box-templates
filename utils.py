@@ -174,6 +174,8 @@ def cleanup_ansible_links(env_dir, repo, repo_facts):
                 repo.index.remove(dest, r=True)
             if os.path.isfile(dest):
                 os.remove(dest)
+            if os.path.isdir(dest):
+                shutil.rmtree(dest)
             os.symlink(src, dest)
             repo.index.add(dest)
 
@@ -199,6 +201,13 @@ def cleanup_linked_dirs(env_dir, repo, repo_facts):
                     os.symlink(os.path.join('..', '..', '..', linked_dir),
                                dir_path)
                     repo.index.add(entry)
+                else:
+                    if os.path.isdir(entry):
+                        shutil.rmtree(entry)
+                        os.symlink(os.path.join('..', '..', '..', linked_dir),
+                                   dir_path)
+                        repo.index.add(entry)
+
         else:
             os.symlink(os.path.join('..', '..', '..', linked_dir),
                        dir_path)
@@ -222,6 +231,8 @@ def cleanup_linked_files(env_dir, repo, repo_facts):
                 if entry in repo_facts['entries']:
                     repo.index.remove(entry)
                     os.remove(entry)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
                 os.symlink(os.path.join(
                     '..', '..', '..', linked_file), file_path)
                 repo.index.add(entry)
