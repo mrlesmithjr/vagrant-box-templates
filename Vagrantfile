@@ -149,6 +149,7 @@ Vagrant.configure(2) do |config|
             # This is commented out until resolution has been found for proper
             # usage. For now it will use the default graphics controller.
             # vbox.customize ['modifyvm', :id, '--graphicscontroller', 'vmsvga']
+            vbox.customize ['modifyvm', :id, '--graphicscontroller', 'vboxvga']
             vbox.customize ['modifyvm', :id, '--hwvirtex', 'on']
             vbox.customize ['modifyvm', :id, '--ioapic', 'on']
             vbox.customize ['modifyvm', :id, '--vram', '128']
