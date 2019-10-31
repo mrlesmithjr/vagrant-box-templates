@@ -42,12 +42,12 @@ def parse_args():
 def decide_action(args):
     """Make decision on what to do from arguments being passed."""
     if args.action == 'repo_info':
-        repo_facts = repo_info()
+        repo, repo_facts = repo_info()
         print(json.dumps(repo_facts, indent=4))
     elif args.action == 'prep_environment':
-        repo_facts = repo_info()
+        repo, repo_facts = repo_info()
         environments = parse_folders()
-        prep_environments(repo_facts, environments)
+        prep_environments(repo, repo_facts, environments)
 
 
 def repo_info():
@@ -68,12 +68,11 @@ def repo_info():
     repo_facts = dict(
         changed_files=changed_files,
         entries=entries,
-        repo=repo,
         remotes=repo_remotes,
         untracked_files=repo.untracked_files,
         working_tree_dir=repo.working_tree_dir
     )
-    return repo_facts
+    return repo, repo_facts
 
 
 def parse_folders():
@@ -87,12 +86,12 @@ def parse_folders():
     return environments
 
 
-def prep_environments(repo_facts, environments):
+def prep_environments(repo, repo_facts, environments):
     """Load existing data from environment.yml then write new data."""
     for env_yaml in environments:
         # logging.info('Processing: %s', env_yaml)
 
-        cleanup_links(env_yaml, repo_facts)
+        cleanup_links(env_yaml, repo, repo_facts)
 
         with open(env_yaml, 'r') as stream:
             data = yaml.load(stream, Loader=yaml.FullLoader)
@@ -138,11 +137,9 @@ def prep_environments(repo_facts, environments):
             stream.close()
 
 
-def cleanup_links(env_yaml, repo_facts):
+def cleanup_links(env_yaml, repo, repo_facts):
     """Cleans up environment symlinks to ensure consistency."""
     env_dir = os.path.dirname(env_yaml)
-
-    repo = repo_facts['repo']
 
     cleanup_ansible_links(env_dir, repo, repo_facts)
     cleanup_linked_dirs(env_dir, repo, repo_facts)
