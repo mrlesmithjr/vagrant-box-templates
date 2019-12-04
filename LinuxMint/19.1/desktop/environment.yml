@@ -15,12 +15,12 @@ nodes:
   - name: node0
     ansible_groups:
       - test_nodes
-    box: mrlesmithjr/linuxmint18-desktop
+    box: mrlesmithjr/linuxmint-19.1
     desktop: true
     disks: []
     interfaces: []
     linked_clone: true
-    mem: 1024
+    mem: 2048
     provision: false
     provisioners: []
     vcpu: 1
