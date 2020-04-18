@@ -1,11 +1,10 @@
-commit 98a82a9ed9bdcd7482d2ca3d82add2b176c27d90
+commit 7a9fbf64d4005aedc2addf94f3a6ffff6b32d199
 Author: Larry Smith Jr <mrlesmithjr@gmail.com>
-Date:   Fri Apr 17 23:25:06 2020 -0400
+Date:   Fri Apr 17 23:26:36 2020 -0400
 
-    Commented out WinRM settings
+    Commented out gui = False for Windows
     
-    Started having some strange issues and commenting out these settings
-    seems to have stabalized Windows winrm communications.
+    For now I want this enabled for Windows rather than relying on RDP.
 
 commit 675434f70aa2ce6dc60567d0b5bbf2304443b344
 Author: Larry Smith Jr <mrlesmithjr@gmail.com>
