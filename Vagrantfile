@@ -162,7 +162,7 @@ Vagrant.configure(2) do |config|
           if node_id['windows']
             vbox.default_nic_type = '82540EM'
             # We set this to false because we can use vagrant rdp
-            vbox.gui = false
+            # vbox.gui = false
             vbox.customize ['modifyvm', :id, '--accelerate2dvideo', 'on']
             vbox.customize ['modifyvm', :id, '--accelerate3d', 'on']
             vbox.customize ['modifyvm', :id, '--graphicscontroller', 'vboxsvga']
@@ -237,7 +237,7 @@ Vagrant.configure(2) do |config|
             if node_id['windows']
               # vmw.vmx['ethernet0.virtualdev'] = 'e1000'
               # We set this to false because we can use vagrant rdp
-              vmw.gui = false
+              # vmw.gui = false
               vmw.vmx['mks.enable3d'] = true
               # else
               #   vmw.vmx['ethernet0.pcislotnumber'] = '33'
