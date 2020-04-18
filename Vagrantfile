@@ -128,8 +128,8 @@ Vagrant.configure(2) do |config|
         if node_id['windows']
           node.vm.guest = :windows
           node.vm.communicator = :winrm
-          config.winrm.transport = :ssl
-          config.winrm.ssl_peer_verification = false
+          # config.winrm.transport = :ssl
+          # config.winrm.ssl_peer_verification = false
         end
       end
 
