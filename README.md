@@ -1,3 +1,11 @@
+> [!CAUTION]
+> ## ⚠️ This Repository Is Archived
+> 
+> This repository is no longer maintained. Vagrant/VirtualBox template workflows have been superseded by container and cloud image approaches.
+> 
+> **Archived:** 2026-03-25
+> **Reason:** Vagrant/Packer VM template workflow obsoleted by modern container and cloud-native tooling.
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
@@ -512,16 +520,16 @@ playbook: playbook.yml
 Bringing machine 'node0' up with 'virtualbox' provider...
 ==> node0: Importing base box 'mrlesmithjr/xenial64'...
 
-[KProgress: 10%
-[KProgress: 20%
-[KProgress: 30%
-[KProgress: 40%
-[KProgress: 50%
-[KProgress: 60%
-[KProgress: 70%
-[KProgress: 80%
-[KProgress: 90%
-[K==> node0: Matching MAC address for NAT networking...
+[KProgress: 10%
+[KProgress: 20%
+[KProgress: 30%
+[KProgress: 40%
+[KProgress: 50%
+[KProgress: 60%
+[KProgress: 70%
+[KProgress: 80%
+[KProgress: 90%
+[K==> node0: Matching MAC address for NAT networking...
 ==> node0: Checking if box 'mrlesmithjr/xenial64' is up to date...
 ==> node0: Setting the name of the VM: server_node0_1498705353100_6863
 ==> node0: Clearing any previously set network interfaces...
